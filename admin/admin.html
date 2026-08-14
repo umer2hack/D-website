@@ -53,7 +53,7 @@
     .stat-card .stat-sub { font-size: 0.7rem; color: var(--grey-600); font-weight: 400; margin-top: 4px; }
 
     /* Tabs */
-    .tabs { display: flex; border-bottom: 1px solid var(--grey-200); margin-bottom: 20px; background: var(--white); border-top: 1px solid var(--grey-200); border-left: 1px solid var(--grey-200); border-right: 1px solid var(--grey-200); }
+    .tabs { display: flex; border-bottom: 1px solid var(--grey-200); margin-bottom: 20px; background: var(--white); border-top: 1px solid var(--grey-200); border-left: 1px solid var(--grey-200); border-right: 1px solid var(--grey-200); flex-wrap: wrap; }
     .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 14px 22px; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: var(--grey-400); transition: all 0.2s; margin-bottom: -1px; }
     .tab-btn.active { color: var(--black); border-bottom-color: var(--black); }
 
@@ -100,6 +100,7 @@
     .btn-cancel { background: none; border: 1px solid var(--grey-200); padding: 10px 20px; font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
     .btn-save { background: var(--black); color: var(--white); border: none; padding: 10px 20px; font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; letter-spacing: 1px; }
     .btn-save:hover { background: var(--grey-600); }
+    .btn-save:disabled { background: var(--grey-400); cursor: not-allowed; }
 
     /* Order detail modal */
     .order-detail { font-size: 0.82rem; font-weight: 400; }
@@ -119,6 +120,14 @@
 
     /* Loading */
     .loading { padding: 40px; text-align: center; color: var(--grey-400); font-size: 0.8rem; letter-spacing: 1px; }
+
+    /* Bulk upload */
+    .bulk-box { background: var(--white); border: 1px solid var(--grey-200); padding: 24px; max-width: 640px; }
+    .bulk-box code { background: var(--grey-100); padding: 1px 5px; font-size: 0.75rem; }
+    .bulk-log { margin-top: 16px; max-height: 240px; overflow-y: auto; border-top: 1px solid var(--grey-200); padding-top: 10px; }
+    .bulk-log-line { font-size: 0.75rem; padding: 4px 0; color: var(--grey-600); }
+    .bulk-log-line.error { color: var(--red); }
+    .bulk-log-line.success { color: var(--green); }
 
     @media (max-width: 900px) { .stats-row { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 600px) {
@@ -184,6 +193,7 @@
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('orders', this)">Orders</button>
       <button class="tab-btn" onclick="switchTab('products', this)">Products</button>
+      <button class="tab-btn" onclick="switchTab('bulk', this)">Bulk Upload</button>
       <button class="tab-btn" onclick="switchTab('settings', this)">Settings</button>
     </div>
 
@@ -226,6 +236,7 @@
         <table>
           <thead>
             <tr>
+              <th>Image</th>
               <th>Name</th>
               <th>Category</th>
               <th>Price (PKR)</th>
@@ -236,6 +247,33 @@
           <tbody id="products-tbody"></tbody>
         </table>
         <div class="empty-state" id="products-empty" style="display:none;"><p>No products yet. Add your first product above.</p></div>
+      </div>
+    </div>
+
+    <!-- BULK UPLOAD PANEL -->
+    <div class="panel" id="panel-bulk">
+      <div class="panel-header">
+        <h2>Bulk Upload Products</h2>
+      </div>
+      <div class="bulk-box">
+        <p style="font-size:0.78rem; color:var(--grey-600); margin-bottom:18px; line-height:1.6;">
+          Upload an Excel file with columns: <code>name</code>, <code>desc</code>, <code>price</code>,
+          <code>category</code>, <code>badge</code> — plus <strong>either</strong> <code>imageUrl</code>
+          (a direct link, if you already have images hosted somewhere) <strong>or</strong>
+          <code>imageFileName</code> (matched exactly, e.g. <code>flask.jpg</code>, against the image
+          folder you select below). Images matched by filename are uploaded straight to Cloudinary from
+          your browser — your server never touches the image bytes.
+        </p>
+        <div class="field-group">
+          <label>Excel File (.xlsx / .xls)</label>
+          <input type="file" id="bulk-excel" accept=".xlsx,.xls">
+        </div>
+        <div class="field-group">
+          <label>Image Folder (optional — only needed for imageFileName rows)</label>
+          <input type="file" id="bulk-images" webkitdirectory directory multiple>
+        </div>
+        <button class="btn-save" id="bulk-submit-btn" onclick="processBulkUpload()" style="width:100%; padding:13px; margin-top:6px;">Upload Products</button>
+        <div class="bulk-log" id="bulk-log"></div>
       </div>
     </div>
 
@@ -308,13 +346,15 @@
         <input type="text" id="prod-badge" placeholder="e.g. Best Seller, New, Top Rated">
       </div>
       <div class="field-group">
-        <label>Image URL (optional)</label>
-        <input type="text" id="prod-image" placeholder="https://…">
+        <label>Product Image</label>
+        <input type="file" id="prod-image-file" accept="image/*" onchange="previewProductImage(event)">
+        <div id="prod-image-preview" style="margin-top:8px;"></div>
+        <input type="hidden" id="prod-image">
       </div>
     </div>
     <div class="modal-foot">
       <button class="btn-cancel" onclick="closeProductModal()">Cancel</button>
-      <button class="btn-save" onclick="saveProduct()">Save Product</button>
+      <button class="btn-save" id="prod-save-btn" onclick="saveProduct()">Save Product</button>
     </div>
   </div>
 </div>
@@ -333,6 +373,9 @@
   </div>
 </div>
 
+<!-- SheetJS for Excel parsing (bulk upload) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
   // ── CONFIG ──
   const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
@@ -341,18 +384,12 @@
   const ADMIN_USER = 'admin';
   let ADMIN_PASS = localStorage.getItem('name_admin_pass') || 'admin123'; // change this!
 
-  // ── PRODUCTS stored locally ──
-  let PRODUCTS = JSON.parse(localStorage.getItem('name_products')) || [
-    { id:1, name:'Stainless Vacuum Flask 510ml', desc:'Keeps drinks hot 12hr / cold 24hr.', price:1200, category:'Drinkware', badge:'Best Seller', image:'' },
-    { id:2, name:'Vegetable Chopper Pro', desc:'6-blade rotating chopper.', price:1599, category:'Kitchen', badge:'New', image:'' },
-    { id:3, name:'Silicone Food Storage Bags', desc:'Set of 4 reusable bags.', price:850, category:'Storage', badge:'', image:'' },
-    { id:4, name:'Electric Spin Scrubber', desc:'360° rotating brush.', price:2499, category:'Cleaning', badge:'Top Rated', image:'' },
-    { id:5, name:'Foldable Dish Rack', desc:'Space-saving stainless rack.', price:1100, category:'Kitchen', badge:'', image:'' },
-    { id:6, name:'Digital Kitchen Scale', desc:'Accurate to 1g, max 5kg.', price:950, category:'Appliances', badge:'', image:'' },
-    { id:7, name:'Magnetic Spice Rack', desc:'Set of 6 wall-mounted tins.', price:780, category:'Storage', badge:'New', image:'' },
-    { id:8, name:'Pour-Over Coffee Dripper', desc:'Borosilicate glass dripper.', price:1350, category:'Drinkware', badge:'', image:'' },
-  ];
+  // Cloudinary — used for direct browser-to-Cloudinary uploads (single product image + bulk upload)
+  const CLOUDINARY_CLOUD_NAME = 'dewysazcj';       // ← update if this store uses a different Cloudinary account
+  const CLOUDINARY_UPLOAD_PRESET = 'product_images'; // ← must be an UNSIGNED preset in your Cloudinary settings
 
+  // ── PRODUCTS (loaded from backend; falls back to localStorage demo data) ──
+  let PRODUCTS = [];
   let allOrders = [];
   let editingProdId = null;
 
@@ -488,6 +525,17 @@
   }
 
   // ── PRODUCTS ──
+  async function loadProducts() {
+    try {
+      const res = await fetch(`${API_URL}/products`);
+      PRODUCTS = await res.json();
+    } catch (e) {
+      // Demo fallback if backend isn't reachable
+      PRODUCTS = JSON.parse(localStorage.getItem('name_products')) || [];
+    }
+    renderProducts();
+  }
+
   function renderProducts() {
     const tbody = document.getElementById('products-tbody');
     const empty = document.getElementById('products-empty');
@@ -495,15 +543,20 @@
     if (PRODUCTS.length === 0) { empty.style.display = 'block'; return; }
     empty.style.display = 'none';
     PRODUCTS.forEach(p => {
+      const id = p._id || p.id;
+      const thumb = p.image
+        ? `<img src="${p.image}" style="width:40px;height:40px;object-fit:cover;">`
+        : `<div style="width:40px;height:40px;background:var(--grey-200);"></div>`;
       const tr = document.createElement('tr');
       tr.innerHTML = `
+        <td>${thumb}</td>
         <td style="font-weight:700">${p.name}</td>
         <td><span style="font-size:0.68rem;padding:3px 8px;background:var(--grey-100);letter-spacing:1px">${p.category}</span></td>
-        <td style="font-weight:700">PKR ${p.price.toLocaleString()}</td>
+        <td style="font-weight:700">PKR ${Number(p.price).toLocaleString()}</td>
         <td style="font-size:0.72rem;color:var(--grey-600)">${p.badge || '—'}</td>
         <td>
-          <button class="action-btn" onclick="openProductModal(${p.id})">Edit</button>
-          <button class="action-btn danger" onclick="deleteProduct(${p.id})">Delete</button>
+          <button class="action-btn" onclick='openProductModal(${JSON.stringify(id)})'>Edit</button>
+          <button class="action-btn danger" onclick='deleteProduct(${JSON.stringify(id)})'>Delete</button>
         </td>`;
       tbody.appendChild(tr);
     });
@@ -513,14 +566,17 @@
   function openProductModal(id) {
     editingProdId = id || null;
     document.getElementById('modal-title').innerText = id ? 'Edit Product' : 'Add Product';
+    document.getElementById('prod-image-preview').innerHTML = '';
+    document.getElementById('prod-image-file').value = '';
     if (id) {
-      const p = PRODUCTS.find(x => x.id === id);
+      const p = PRODUCTS.find(x => (x._id || x.id) === id);
       document.getElementById('prod-name').value = p.name;
       document.getElementById('prod-desc').value = p.desc;
       document.getElementById('prod-price').value = p.price;
       document.getElementById('prod-cat').value = p.category;
       document.getElementById('prod-badge').value = p.badge || '';
       document.getElementById('prod-image').value = p.image || '';
+      if (p.image) document.getElementById('prod-image-preview').innerHTML = `<img src="${p.image}" style="width:70px;height:70px;object-fit:cover;">`;
     } else {
       document.getElementById('prod-name').value = '';
       document.getElementById('prod-desc').value = '';
@@ -533,34 +589,171 @@
   }
   function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
 
-  function saveProduct() {
+  // Upload a single selected image straight to Cloudinary and preview it
+  async function previewProductImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const preview = document.getElementById('prod-image-preview');
+    const saveBtn = document.getElementById('prod-save-btn');
+    preview.innerHTML = `<span style="font-size:0.72rem;color:var(--grey-600)">Uploading…</span>`;
+    saveBtn.disabled = true;
+    try {
+      const url = await uploadToCloudinary(file);
+      document.getElementById('prod-image').value = url;
+      preview.innerHTML = `<img src="${url}" style="width:70px;height:70px;object-fit:cover;">`;
+    } catch (err) {
+      preview.innerHTML = `<span style="font-size:0.72rem;color:var(--red)">Upload failed: ${err.message}</span>`;
+    }
+    saveBtn.disabled = false;
+  }
+
+  async function saveProduct() {
     const name = document.getElementById('prod-name').value.trim();
     const price = parseFloat(document.getElementById('prod-price').value);
     if (!name || !price) { alert('Name and price are required.'); return; }
     const prod = {
-      id: editingProdId || Date.now(),
       name, price,
       desc: document.getElementById('prod-desc').value.trim(),
       category: document.getElementById('prod-cat').value,
       badge: document.getElementById('prod-badge').value.trim(),
       image: document.getElementById('prod-image').value.trim(),
     };
-    if (editingProdId) {
-      const idx = PRODUCTS.findIndex(p => p.id === editingProdId);
-      PRODUCTS[idx] = prod;
-    } else {
-      PRODUCTS.push(prod);
+    try {
+      if (editingProdId) {
+        await fetch(`${API_URL}/products/${editingProdId}`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(prod) });
+      } else {
+        await fetch(`${API_URL}/products`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(prod) });
+      }
+      await loadProducts();
+    } catch (e) {
+      alert('Could not save product — check your backend connection.');
     }
-    localStorage.setItem('name_products', JSON.stringify(PRODUCTS));
-    renderProducts();
     closeProductModal();
   }
 
-  function deleteProduct(id) {
+  async function deleteProduct(id) {
     if (!confirm('Delete this product?')) return;
-    PRODUCTS = PRODUCTS.filter(p => p.id !== id);
-    localStorage.setItem('name_products', JSON.stringify(PRODUCTS));
-    renderProducts();
+    try {
+      await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
+      await loadProducts();
+    } catch (e) {
+      alert('Could not delete product — check your backend connection.');
+    }
+  }
+
+  // ── BULK UPLOAD ──
+  function bulkLog(text, type) {
+    const log = document.getElementById('bulk-log');
+    const div = document.createElement('div');
+    div.className = 'bulk-log-line' + (type ? ' ' + type : '');
+    div.innerText = text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  async function uploadToCloudinary(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error(data.error?.message || 'Upload failed');
+    return data.secure_url;
+  }
+
+  async function processBulkUpload() {
+    const excelInput = document.getElementById('bulk-excel');
+    const imgInput = document.getElementById('bulk-images');
+    const btn = document.getElementById('bulk-submit-btn');
+    document.getElementById('bulk-log').innerHTML = '';
+
+    if (!excelInput.files[0]) { alert('Please select an Excel file first.'); return; }
+
+    btn.disabled = true;
+    const imageFiles = imgInput.files || [];
+
+    let rows;
+    try {
+      const data = await excelInput.files[0].arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(sheet);
+    } catch (err) {
+      bulkLog(`Could not read Excel file: ${err.message}`, 'error');
+      btn.disabled = false;
+      return;
+    }
+
+    if (!rows || rows.length === 0) {
+      bulkLog('No rows found in the Excel file.', 'error');
+      btn.disabled = false;
+      return;
+    }
+
+    bulkLog(`Found ${rows.length} row(s). Processing…`);
+    const products = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const name = row.name || row.Name;
+      if (!name) { bulkLog(`Row ${i + 1}: skipped (missing name)`, 'error'); continue; }
+
+      let imageUrl = row.imageUrl || row.ImageUrl || row.image || '';
+
+      if (!imageUrl && (row.imageFileName || row.ImageFileName) && imageFiles.length) {
+        const targetName = row.imageFileName || row.ImageFileName;
+        const match = Array.from(imageFiles).find(f => f.name === targetName);
+        if (match) {
+          try {
+            bulkLog(`Row ${i + 1}: uploading "${match.name}" to Cloudinary…`);
+            imageUrl = await uploadToCloudinary(match);
+          } catch (err) {
+            bulkLog(`Row ${i + 1}: image upload failed — ${err.message}`, 'error');
+          }
+        } else {
+          bulkLog(`Row ${i + 1}: no matching image found for "${targetName}"`, 'error');
+        }
+      }
+
+      products.push({
+        name,
+        desc: row.desc || row.description || '',
+        price: Number(row.price) || 0,
+        category: row.category || 'Kitchen',
+        badge: row.badge || '',
+        image: imageUrl,
+      });
+    }
+
+    if (products.length === 0) {
+      bulkLog('No valid products to upload.', 'error');
+      btn.disabled = false;
+      return;
+    }
+
+    bulkLog(`Sending ${products.length} product(s) to the server…`);
+
+    try {
+      const res = await fetch(`${API_URL}/products/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products })
+      });
+      const result = await res.json();
+      if (result.success) {
+        bulkLog(`Done — ${result.count} product(s) added.`, 'success');
+        await loadProducts();
+      } else {
+        bulkLog(`Server error: ${result.error || 'unknown error'}`, 'error');
+      }
+    } catch (err) {
+      bulkLog(`Request failed: ${err.message}`, 'error');
+    }
+
+    btn.disabled = false;
   }
 
   // ── SETTINGS ──
@@ -573,7 +766,7 @@
   // ── INIT ──
   function init() {
     loadOrders();
-    renderProducts();
+    loadProducts();
   }
 
   // Close modals on overlay click

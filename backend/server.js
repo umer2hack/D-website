@@ -9,7 +9,7 @@ const app = express();
 
 // ── Middleware ──
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '2mb' })); // bulk product payloads are JSON-only (no image bytes), but bumped just in case
 app.use(express.static('public')); // serve your HTML files from /public
 
 // ── MongoDB Connection ──
@@ -43,7 +43,7 @@ const productSchema = new mongoose.Schema({
   price:    { type: Number, required: true },
   category: { type: String, default: 'Kitchen' },
   badge:    { type: String, default: '' },
-  image:    { type: String, default: '' },
+  image:    { type: String, default: '' }, // Cloudinary secure_url — uploaded directly from the browser
   active:   { type: Boolean, default: true },
 }, { timestamps: true });
 
@@ -129,7 +129,7 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// POST /api/products — add a product (admin)
+// POST /api/products — add a single product (admin)
 app.post('/api/products', async (req, res) => {
   try {
     const product = new Product(req.body);
@@ -137,6 +137,33 @@ app.post('/api/products', async (req, res) => {
     res.status(201).json({ success: true, product });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+// POST /api/products/bulk — bulk-insert products (admin bulk upload)
+// Expects: { products: [ { name, desc, price, category, badge, image }, ... ] }
+// Images are uploaded to Cloudinary client-side before this call — this route
+// only ever receives lightweight JSON, keeping load off this server.
+// IMPORTANT: this route must be declared before any "/:id" routes below it,
+// otherwise Express will try to match "bulk" as an :id and 404/500 will follow.
+app.post('/api/products/bulk', async (req, res) => {
+  try {
+    const { products } = req.body;
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({ success: false, error: 'No products provided' });
+    }
+    // ordered: false — keeps inserting the rest even if one row fails validation
+    const inserted = await Product.insertMany(products, { ordered: false });
+    res.status(201).json({ success: true, count: inserted.length });
+  } catch (err) {
+    console.error('Bulk insert error:', err);
+    // insertMany with ordered:false throws even on partial success — report what we can
+    const insertedCount = err?.insertedDocs?.length || err?.result?.insertedCount || 0;
+    res.status(insertedCount > 0 ? 201 : 500).json({
+      success: insertedCount > 0,
+      count: insertedCount,
+      error: err.message,
+    });
   }
 });
 
