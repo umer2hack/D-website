@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery | NAME</title>
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --grey-100: #f5f5f5;
+      --grey-200: #e8e8e8;
+      --grey-400: #aaaaaa;
+      --grey-600: #555555;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--white); color: var(--black); overflow-x: hidden; }
+
+    .ann { background: var(--black); color: var(--white); text-align: center; padding: 9px 16px; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; }
+
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--white); border-bottom: 1px solid var(--grey-200);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 60px;
+    }
+    .nav-logo { font-size: 1.25rem; font-weight: 900; letter-spacing: -1px; color: var(--black); text-decoration: none; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--grey-600); border-bottom: 2px solid var(--black); padding-bottom: 2px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .cart-btn { display: flex; align-items: center; gap: 6px; background: var(--black); color: var(--white); border: none; padding: 8px 14px; cursor: pointer; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; transition: background 0.2s; white-space: nowrap; }
+    .cart-btn:hover { background: var(--grey-600); }
+    .badge { background: var(--white); color: var(--black); font-size: 0.6rem; font-weight: 900; border-radius: 50%; width: 17px; height: 17px; display: flex; align-items: center; justify-content: center; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--black); border-radius: 1px; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--white); border-bottom: 1px solid var(--grey-200); z-index: 199; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { padding: 14px 5%; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--grey-200); }
+
+    /* Page header */
+    .page-header { padding: 56px 5% 40px; border-bottom: 1px solid var(--grey-200); }
+    .page-header p { font-size: 0.68rem; letter-spacing: 4px; text-transform: uppercase; color: var(--grey-400); margin-bottom: 10px; }
+    .page-header h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; letter-spacing: -2px; }
+
+    /* Filter tabs */
+    .filters { display: flex; gap: 0; padding: 0 5%; border-bottom: 1px solid var(--grey-200); overflow-x: auto; scrollbar-width: none; }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 16px 20px; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: var(--grey-400); transition: all 0.2s; white-space: nowrap; margin-bottom: -1px; }
+    .filter-btn:hover { color: var(--black); }
+    .filter-btn.active { color: var(--black); border-bottom-color: var(--black); }
+
+    /* Gallery grid */
+    .gallery-grid { columns: 3; column-gap: 1px; padding: 1px 5% 60px; background: var(--grey-200); }
+    .gallery-item { break-inside: avoid; margin-bottom: 1px; position: relative; overflow: hidden; cursor: pointer; background: var(--white); }
+    .gallery-item img { width: 100%; display: block; transition: transform 0.4s ease; }
+    .gallery-item:hover img { transform: scale(1.04); }
+    .gallery-placeholder { background: var(--grey-100); aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--grey-400); transition: background 0.2s; }
+    .gallery-item:hover .gallery-placeholder { background: var(--grey-200); }
+    .gallery-placeholder svg { width: 32px; height: 32px; opacity: 0.3; }
+    .gallery-placeholder span { font-size: 0.7rem; letter-spacing: 1px; }
+    .gallery-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0); display: flex; align-items: flex-end; padding: 16px; transition: background 0.3s; }
+    .gallery-item:hover .gallery-overlay { background: rgba(0,0,0,0.35); }
+    .gallery-info { opacity: 0; transform: translateY(8px); transition: all 0.3s; }
+    .gallery-item:hover .gallery-info { opacity: 1; transform: translateY(0); }
+    .gallery-info h3 { font-size: 0.85rem; font-weight: 700; color: white; margin-bottom: 2px; }
+    .gallery-info span { font-size: 0.72rem; color: rgba(255,255,255,0.75); }
+
+    /* Lightbox */
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox.open { display: flex; }
+    .lightbox-inner { position: relative; max-width: 700px; width: 100%; }
+    .lightbox-img { width: 100%; max-height: 80vh; object-fit: contain; display: block; }
+    .lightbox-placeholder { background: var(--grey-100); width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--grey-400); }
+    .lightbox-close { position: absolute; top: -44px; right: 0; background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; line-height: 1; }
+    .lightbox-caption { color: white; margin-top: 14px; }
+    .lightbox-caption h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .lightbox-caption p { font-size: 0.78rem; color: rgba(255,255,255,0.6); font-weight: 400; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border: none; color: white; width: 44px; height: 44px; font-size: 1.2rem; cursor: pointer; transition: background 0.2s; }
+    .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
+    .lightbox-prev { left: -56px; }
+    .lightbox-next { right: -56px; }
+
+    /* Empty state */
+    .gallery-empty { display: none; padding: 60px 5%; text-align: center; color: var(--grey-400); }
+    .gallery-empty p { font-size: 0.85rem; letter-spacing: 1px; }
+
+    footer { background: var(--black); color: var(--white); text-align: center; padding: 28px; font-size: 0.75rem; font-weight: 400; }
+    footer a { color: rgba(255,255,255,0.5); text-decoration: none; margin-left: 16px; }
+    footer a:hover { color: white; }
+
+    .wa-fab { position: fixed; bottom: 24px; right: 24px; background: #25D366; color: white; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 250; text-decoration: none; transition: transform 0.2s; }
+    .wa-fab:hover { transform: scale(1.1); }
+
+    @media (max-width: 900px) { .gallery-grid { columns: 2; } }
+    @media (max-width: 650px) {
+      nav { padding: 0 4%; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .cart-btn span:not(.badge) { display: none; }
+      .gallery-grid { columns: 2; padding: 1px 4% 40px; }
+      .lightbox-prev { left: -40px; }
+      .lightbox-next { right: -40px; }
+      .page-header { padding: 36px 5% 28px; }
+    }
+    @media (max-width: 400px) { .gallery-grid { columns: 1; } }
+  </style>
+</head>
+<body>
+
+<div class="ann">🚚 Free delivery on orders over PKR 1,499 &nbsp;|&nbsp; COD Available Nationwide</div>
+
+<nav id="main-nav">
+  <a href="index.html" class="nav-logo">NAME</a>
+  <ul class="nav-links">
+    <li><a href="index.html#shop">Shop</a></li>
+    <li><a href="index.html#categories">Categories</a></li>
+    <li><a href="gallery.html" class="active">Gallery</a></li>
+    <li><a href="index.html#about">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="window.location.href='index.html'" aria-label="Cart">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.72l1.38-9.28H6"/></svg>
+      <span>Cart</span>
+      <span class="badge" id="cart-count">0</span>
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html#shop">Shop</a>
+    <a href="index.html#categories">Categories</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="index.html#about">About</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <p>Visual Showcase</p>
+  <h1>Product Gallery</h1>
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" onclick="filterGallery('all', this)">All</button>
+  <button class="filter-btn" onclick="filterGallery('Kitchen', this)">Kitchen</button>
+  <button class="filter-btn" onclick="filterGallery('Storage', this)">Storage</button>
+  <button class="filter-btn" onclick="filterGallery('Cleaning', this)">Cleaning</button>
+  <button class="filter-btn" onclick="filterGallery('Appliances', this)">Appliances</button>
+  <button class="filter-btn" onclick="filterGallery('Drinkware', this)">Drinkware</button>
+</div>
+
+<div class="gallery-grid" id="gallery-grid"></div>
+<div class="gallery-empty" id="gallery-empty"><p>No items in this category yet.</p></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-inner" id="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightboxBtn()">✕</button>
+    <button class="lightbox-nav lightbox-prev" onclick="shiftLightbox(-1)">‹</button>
+    <button class="lightbox-nav lightbox-next" onclick="shiftLightbox(1)">›</button>
+    <div id="lightbox-content"></div>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+</div>
+
+<footer>
+  <p style="margin-bottom:8px;">© 2025 NAME — All Rights Reserved
+    <a href="policy.html">Return Policy</a>
+    <a href="index.html">Home</a>
+  </p>
+</footer>
+
+<a href="https://wa.me/923000000000" target="_blank" class="wa-fab" aria-label="WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+  // Gallery items — add your real images to the `image` field
+  const GALLERY = [
+    { id:1, name:'Vacuum Flask 510ml', category:'Drinkware', image:'', desc:'Stainless steel, keeps hot 12hr' },
+    { id:2, name:'Vegetable Chopper', category:'Kitchen', image:'', desc:'6-blade rotating chopper' },
+    { id:3, name:'Silicone Storage Bags', category:'Storage', image:'', desc:'Set of 4, freezer safe' },
+    { id:4, name:'Spin Scrubber', category:'Cleaning', image:'', desc:'360° electric brush' },
+    { id:5, name:'Dish Rack Foldable', category:'Kitchen', image:'', desc:'Space-saving stainless design' },
+    { id:6, name:'Digital Kitchen Scale', category:'Appliances', image:'', desc:'Accurate to 1g, max 5kg' },
+    { id:7, name:'Magnetic Spice Rack', category:'Storage', image:'', desc:'Set of 6 wall-mounted tins' },
+    { id:8, name:'Pour-Over Dripper', category:'Drinkware', image:'', desc:'Borosilicate glass' },
+    { id:9, name:'Silicone Spatula Set', category:'Kitchen', image:'', desc:'Heat resistant up to 230°C' },
+    { id:10, name:'Vacuum Food Sealer', category:'Appliances', image:'', desc:'Extends food freshness 5×' },
+    { id:11, name:'Microfibre Mop', category:'Cleaning', image:'', desc:'360° spin, hands-free wringing' },
+    { id:12, name:'Glass Lunch Box', category:'Storage', image:'', desc:'Leakproof, oven & microwave safe' },
+  ];
+
+  let currentFilter = 'all';
+  let currentIndex = 0;
+  let visibleItems = [];
+
+  function renderGallery(filter) {
+    const grid = document.getElementById('gallery-grid');
+    const empty = document.getElementById('gallery-empty');
+    visibleItems = filter === 'all' ? GALLERY : GALLERY.filter(i => i.category === filter);
+    grid.innerHTML = '';
+    if (visibleItems.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    visibleItems.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = 'gallery-item';
+      div.onclick = () => openLightbox(idx);
+      div.innerHTML = item.image
+        ? `<img src="${item.image}" alt="${item.name}" loading="lazy">
+           <div class="gallery-overlay"><div class="gallery-info"><h3>${item.name}</h3><span>${item.category}</span></div></div>`
+        : `<div class="gallery-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>${item.name}</span></div>
+           <div class="gallery-overlay"><div class="gallery-info"><h3>${item.name}</h3><span>${item.category}</span></div></div>`;
+      grid.appendChild(div);
+    });
+  }
+
+  function filterGallery(cat, btn) {
+    currentFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGallery(cat);
+  }
+
+  function openLightbox(idx) {
+    currentIndex = idx;
+    showLightboxItem();
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function showLightboxItem() {
+    const item = visibleItems[currentIndex];
+    const content = document.getElementById('lightbox-content');
+    const caption = document.getElementById('lightbox-caption');
+    content.innerHTML = item.image
+      ? `<img class="lightbox-img" src="${item.image}" alt="${item.name}">`
+      : `<div class="lightbox-placeholder">No image added yet</div>`;
+    caption.innerHTML = `<h3>${item.name}</h3><p>${item.desc} · ${item.category}</p>`;
+  }
+
+  function shiftLightbox(dir) {
+    currentIndex = (currentIndex + dir + visibleItems.length) % visibleItems.length;
+    showLightboxItem();
+  }
+
+  function closeLightbox(e) {
+    if (e.target === document.getElementById('lightbox')) closeLightboxBtn();
+  }
+  function closeLightboxBtn() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('lightbox').classList.contains('open')) return;
+    if (e.key === 'ArrowRight') shiftLightbox(1);
+    if (e.key === 'ArrowLeft') shiftLightbox(-1);
+    if (e.key === 'Escape') closeLightboxBtn();
+  });
+
+  function toggleMenu() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+    document.getElementById('hamburger').classList.toggle('open');
+  }
+
+  // Cart count
+  const cart = JSON.parse(localStorage.getItem('name_cart')) || [];
+  document.getElementById('cart-count').innerText = cart.reduce((s,i) => s + i.quantity, 0);
+
+  renderGallery('all');
+</script>
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAME — Kitchen & Home Gadgets</title>
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --grey-100: #f5f5f5;
+      --grey-200: #e8e8e8;
+      --grey-400: #aaaaaa;
+      --grey-600: #555555;
+      --accent: #0a0a0a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { width: 100%; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: var(--white);
+      color: var(--black);
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* ── ANNOUNCEMENT ── */
+    .ann {
+      background: var(--black);
+      color: var(--white);
+      text-align: center;
+      padding: 9px 16px;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--white);
+      border-bottom: 1px solid var(--grey-200);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 60px;
+    }
+    .nav-logo { font-size: 1.25rem; font-weight: 900; letter-spacing: -1px; color: var(--black); text-decoration: none; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--grey-600); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .cart-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--black); color: var(--white);
+      border: none; padding: 8px 14px; cursor: pointer;
+      font-family: inherit; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .cart-btn:hover { background: var(--grey-600); }
+    .badge {
+      background: var(--white); color: var(--black);
+      font-size: 0.6rem; font-weight: 900;
+      border-radius: 50%; width: 17px; height: 17px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--black); border-radius: 1px; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none; flex-direction: column;
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--white); border-bottom: 1px solid var(--grey-200);
+      z-index: 199;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { padding: 14px 5%; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--grey-200); transition: background 0.15s; }
+    .mobile-menu a:hover { background: var(--grey-100); }
+
+    /* ── HERO ── */
+    .hero {
+    display: flex;
+    min-height: 50vh;
+    }
+    .hero-text {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 60px 6% 60px 5%;
+      background: var(--white);
+    }
+    .hero-eyebrow { font-size: 0.68rem; letter-spacing: 4px; text-transform: uppercase; color: var(--grey-600); margin-bottom: 20px; }
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -2px; margin-bottom: 22px;
+    }
+    .hero-title span { border-bottom: 4px solid var(--black); }
+    .hero-sub { font-size: 0.9rem; color: var(--grey-600); line-height: 1.7; max-width: 380px; margin-bottom: 36px; font-weight: 400; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary { background: var(--black); color: var(--white); padding: 14px 28px; border: 2px solid var(--black); font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s; }
+    .btn-primary:hover { background: var(--white); color: var(--black); }
+    .btn-outline { background: transparent; color: var(--black); padding: 14px 28px; border: 2px solid var(--black); font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--black); color: var(--white); }
+    .hero-img {
+      background: var(--grey-100);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    .hero-img img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-img-placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; color: var(--grey-400);
+    }
+    .hero-img-placeholder svg { width: 64px; height: 64px; opacity: 0.3; }
+    .hero-img-placeholder p { font-size: 0.8rem; letter-spacing: 1px; }
+
+    /* ── STATS STRIP ── */
+    .stats { background: var(--black); color: var(--white); display: flex; justify-content: space-around; flex-wrap: wrap; gap: 0; }
+    .stat { padding: 28px 20px; text-align: center; flex: 1; min-width: 140px; border-right: 1px solid rgba(255,255,255,0.08); }
+    .stat:last-child { border-right: none; }
+    .stat-num { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; display: block; }
+    .stat-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 4px; display: block; }
+
+    /* ── SECTION HEADER ── */
+    .section-header { padding: 60px 5% 36px; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .section-header h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 900; letter-spacing: -1px; }
+    .section-header a { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--black); padding-bottom: 2px; white-space: nowrap; }
+
+    /* ── PRODUCTS ── */
+    #shop { background: var(--white); }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1px; padding: 0 5% 60px; background: var(--grey-200); }
+    .product-card { background: var(--white); cursor: pointer; position: relative; overflow: hidden; }
+    .product-card:hover .card-img img { transform: scale(1.04); }
+    .card-img { aspect-ratio: 1/1; overflow: hidden; background: var(--grey-100); display: flex; align-items: center; justify-content: center; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .card-img-placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--grey-400); font-size: 0.72rem; letter-spacing: 1px; }
+    .card-img-placeholder svg { width: 40px; height: 40px; opacity: 0.25; }
+    .card-badge { position: absolute; top: 12px; left: 12px; background: var(--black); color: var(--white); font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; padding: 4px 8px; text-transform: uppercase; }
+    .card-body { padding: 16px; }
+    .card-body h3 { font-size: 0.9rem; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; line-height: 1.3; }
+    .card-body p { font-size: 0.75rem; color: var(--grey-600); margin-bottom: 12px; font-weight: 400; line-height: 1.5; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .price { font-size: 1rem; font-weight: 900; }
+    .add-btn {
+      background: var(--black); color: var(--white);
+      border: none; padding: 8px 14px; font-family: inherit;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; cursor: pointer; transition: background 0.2s;
+    }
+    .add-btn:hover { background: var(--grey-600); }
+
+    /* ── CATEGORIES ── */
+    #categories { background: var(--grey-100); }
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding: 0 5% 60px; background: var(--grey-200); }
+    .cat-card { background: var(--white); padding: 32px 24px; cursor: pointer; transition: background 0.2s; border-left: 3px solid transparent; }
+    .cat-card:hover { background: var(--black); color: var(--white); border-left-color: var(--black); }
+    .cat-card:hover .cat-icon { color: var(--white); }
+    .cat-card:hover .cat-desc { color: rgba(255,255,255,0.6); }
+    .cat-icon { font-size: 2rem; margin-bottom: 12px; display: block; }
+    .cat-card h3 { font-size: 1rem; font-weight: 900; letter-spacing: -0.3px; margin-bottom: 6px; }
+    .cat-desc { font-size: 0.75rem; color: var(--grey-600); font-weight: 400; line-height: 1.6; }
+
+    /* ── FEATURES ── */
+    #features { background: var(--white); }
+    .features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; padding: 0 5% 60px; background: var(--grey-200); }
+    .feature { background: var(--white); padding: 30px 22px; }
+    .feature-num { font-size: 2.5rem; font-weight: 900; letter-spacing: -2px; color: var(--grey-200); line-height: 1; margin-bottom: 8px; }
+    .feature h3 { font-size: 0.85rem; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 6px; }
+    .feature p { font-size: 0.75rem; color: var(--grey-600); font-weight: 400; line-height: 1.6; }
+
+    /* ── CART DRAWER ── */
+    .cart-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; }
+    .cart-overlay.open { display: block; }
+    .cart-drawer {
+      position: fixed; top: 0; right: -420px; width: 420px; max-width: 100vw;
+      height: 100%; background: var(--white); z-index: 301;
+      display: flex; flex-direction: column;
+      transition: right 0.3s ease; box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+    }
+    .cart-drawer.open { right: 0; }
+    .cart-head { padding: 20px 24px; border-bottom: 1px solid var(--grey-200); display: flex; align-items: center; justify-content: space-between; }
+    .cart-head h2 { font-size: 1rem; font-weight: 900; letter-spacing: -0.3px; }
+    .close-cart { background: none; border: none; cursor: pointer; font-size: 1.4rem; line-height: 1; color: var(--black); }
+    .cart-items { flex: 1; overflow-y: auto; padding: 16px 24px; }
+    .cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; color: var(--grey-400); }
+    .cart-empty svg { width: 48px; height: 48px; opacity: 0.2; }
+    .cart-empty p { font-size: 0.8rem; letter-spacing: 1px; }
+    .cart-item { display: flex; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--grey-200); }
+    .cart-item-img { width: 64px; height: 64px; object-fit: cover; background: var(--grey-100); flex-shrink: 0; }
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-info strong { font-size: 0.82rem; display: block; margin-bottom: 3px; }
+    .cart-item-info span { font-size: 0.72rem; color: var(--grey-600); font-weight: 400; }
+    .cart-item-price { font-size: 0.85rem; font-weight: 900; white-space: nowrap; }
+    .cart-item-remove { background: none; border: none; cursor: pointer; color: var(--grey-400); font-size: 1.1rem; align-self: flex-start; margin-left: 8px; line-height: 1; }
+    .cart-item-remove:hover { color: var(--black); }
+    .cart-foot { padding: 20px 24px; border-top: 1px solid var(--grey-200); }
+    .cart-total { display: flex; justify-content: space-between; font-weight: 900; font-size: 1rem; margin-bottom: 6px; }
+    .cart-shipping { font-size: 0.7rem; color: var(--grey-600); font-weight: 400; margin-bottom: 16px; }
+    .btn-checkout { width: 100%; background: var(--black); color: var(--white); border: none; padding: 15px; font-family: inherit; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+    .btn-checkout:hover { background: var(--grey-600); }
+
+    /* ── FOOTER ── */
+    footer { background: var(--black); color: var(--white); padding: 48px 5% 24px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+    .footer-brand h3 { font-size: 1.1rem; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
+    .footer-brand p { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.7; font-weight: 400; max-width: 280px; }
+    .footer-col h4 { font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 14px; }
+    .footer-col a { display: block; font-size: 0.8rem; color: rgba(255,255,255,0.7); text-decoration: none; margin-bottom: 8px; font-weight: 400; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .footer-bottom p { font-size: 0.72rem; color: rgba(255,255,255,0.3); font-weight: 400; }
+    .footer-bottom a { font-size: 0.72rem; color: rgba(255,255,255,0.4); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--white); }
+
+    /* ── WA FAB ── */
+    .wa-fab {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #25D366; color: white;
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      z-index: 250; text-decoration: none; transition: transform 0.2s;
+    }
+    .wa-fab:hover { transform: scale(1.1); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .cat-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 650px) {
+      nav { padding: 0 4%; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .cart-btn span:not(.badge) { display: none; }
+
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-img { height: 240px; order: -1; }
+      .hero-text { padding: 36px 5%; }
+      .hero-title { letter-spacing: -1.5px; }
+
+      .stats { flex-direction: row; }
+      .stat { padding: 20px 12px; }
+      .stat-num { font-size: 1.4rem; }
+
+      .section-header { padding: 40px 5% 24px; }
+
+      .product-grid { grid-template-columns: 1fr 1fr; padding: 0 4% 40px; }
+      .card-body { padding: 12px; }
+      .card-body h3 { font-size: 0.8rem; }
+      .card-body p { display: none; }
+
+      .cat-grid { grid-template-columns: 1fr; padding: 0 4% 40px; }
+      .features-grid { grid-template-columns: 1fr 1fr; padding: 0 4% 40px; }
+
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      .footer-col:nth-child(2), .footer-col:nth-child(3) { display: flex; flex-direction: column; }
+
+      .cart-drawer { width: 100%; max-width: 100vw; }
+      .wa-fab { width: 46px; height: 46px; bottom: 18px; right: 16px; }
+    }
+
+    @media (max-width: 380px) {
+      .product-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="ann">🚚 Free delivery on orders over PKR 1,499 &nbsp;|&nbsp; COD Available Nationwide</div>
+
+<nav id="main-nav">
+  <a href="index.html" class="nav-logo">NAME</a>
+  <ul class="nav-links">
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#categories">Categories</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="openCart()" aria-label="Open cart">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.72l1.38-9.28H6"/></svg>
+      <span>Cart</span>
+      <span class="badge" id="cart-count">0</span>
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#shop" onclick="toggleMenu()">Shop</a>
+    <a href="#categories" onclick="toggleMenu()">Categories</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="#about" onclick="toggleMenu()">About</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <p class="hero-eyebrow">Kitchen & Home Essentials</p>
+    <h1 class="hero-title">Smart Tools<br>for <span>Smarter</span><br>Living</h1>
+    <p class="hero-sub">Curated kitchen and home gadgets that actually work — delivered straight to your door across Pakistan.</p>
+    <div class="hero-actions">
+      <a href="#shop" class="btn-primary">Shop Now</a>
+      <a href="gallery.html" class="btn-outline">View Gallery</a>
+    </div>
+  </div>
+  
+</section>
+
+
+<!-- SHOP -->
+<section id="shop">
+  <div class="section-header">
+    <h2>Featured Products</h2>
+    <a href="#shop">View All →</a>
+  </div>
+  <div class="product-grid" id="product-grid">
+    <!-- Injected by JS -->
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section id="categories">
+  <div class="section-header">
+    <h2>Shop by Category</h2>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card" onclick="filterCategory('Kitchen')">
+      <span class="cat-icon">🍳</span>
+      <h3>Kitchen Tools</h3>
+      <p class="cat-desc">Chopping aids, peelers, graters, and time-saving prep gadgets.</p>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Storage')">
+      <span class="cat-icon">📦</span>
+      <h3>Storage & Organization</h3>
+      <p class="cat-desc">Keep your spaces clean and clutter-free with smart storage.</p>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Cleaning')">
+      <span class="cat-icon">✨</span>
+      <h3>Cleaning Gadgets</h3>
+      <p class="cat-desc">Modern cleaning tools that cut effort and save time.</p>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Appliances')">
+      <span class="cat-icon">⚡</span>
+      <h3>Small Appliances</h3>
+      <p class="cat-desc">Compact electric gadgets that do the heavy lifting for you.</p>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Drinkware')">
+      <span class="cat-icon">☕</span>
+      <h3>Drinkware</h3>
+      <p class="cat-desc">Mugs, flasks, and smart bottles for hot and cold drinks.</p>
+    </div>
+    <div class="cat-card" onclick="filterCategory('Decor')">
+      <span class="cat-icon">🏠</span>
+      <h3>Home Decor</h3>
+      <p class="cat-desc">Functional and stylish accessories for every room.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-header">
+    <h2>Why NAME?</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-num">01</div>
+      <h3>Curated Products</h3>
+      <p>Every item is tested and selected for quality and usefulness — no filler.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">02</div>
+      <h3>Cash on Delivery</h3>
+      <p>Pay when you receive. No advance payment, no risk — just order and relax.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">03</div>
+      <h3>Fast Shipping</h3>
+      <p>Orders dispatched within 24 hours. Delivery in 2–4 business days.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">04</div>
+      <h3>Easy Returns</h3>
+      <p>7-day hassle-free returns if you're not satisfied with your purchase.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" style="background: var(--black); color: var(--white); padding: 72px 5%;">
+  <div style="max-width: 600px;">
+    <p style="font-size:0.68rem; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:16px;">About Us</p>
+    <h2 style="font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight:900; letter-spacing:-1.5px; line-height:1.1; margin-bottom:20px;">We make your home<br>work smarter.</h2>
+    <p style="font-size:0.9rem; color:rgba(255,255,255,0.6); line-height:1.8; font-weight:400; margin-bottom:32px;">NAME is a Pakistan-based home gadgets brand. We source the best kitchen and home tools from around the world and deliver them to your doorstep — with zero hassle. Our goal is simple: make everyday tasks easier.</p>
+    <a href="https://wa.me/923000000000" target="_blank" class="btn-primary" style="display:inline-block;">Contact on WhatsApp</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h3>NAME</h3>
+      <p>Pakistan's go-to destination for smart kitchen and home gadgets. Quality products, fast delivery, and honest pricing.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <a href="#shop">All Products</a>
+      <a href="#categories">Kitchen Tools</a>
+      <a href="#categories">Storage</a>
+      <a href="#categories">Appliances</a>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <a href="policy.html">Return Policy</a>
+      <a href="https://wa.me/923000000000">WhatsApp</a>
+      <a href="#about">About Us</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 NAME — All Rights Reserved</p>
+    <a href="policy.html">Return & Refund Policy</a>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-head">
+    <h2>Your Cart (<span id="drawer-count">0</span>)</h2>
+    <button class="close-cart" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="drawer-items"></div>
+  <div class="cart-foot" id="cart-foot" style="display:none;">
+    <div class="cart-total"><span>Total</span><span>PKR <span id="drawer-total">0</span></span></div>
+    <p class="cart-shipping">+ PKR 200 shipping (free over PKR 1,499)</p>
+    <button class="btn-checkout" onclick="goCheckout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<a href="https://wa.me/923000000000" target="_blank" class="wa-fab" aria-label="WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+  // ── SAMPLE PRODUCTS (replace with your real data) ──
+  const PRODUCTS = [
+    { id:1, name:'Stainless Vacuum Flask 510ml', desc:'Keeps drinks hot 12hr / cold 24hr. Leak-proof lid.', price:1200, category:'Drinkware', badge:'Best Seller', image:'' },
+    { id:2, name:'Vegetable Chopper Pro', desc:'6-blade rotating chopper. Saves 10 min of prep time.', price:1599, category:'Kitchen', badge:'New', image:'' },
+    { id:3, name:'Silicone Food Storage Bags', desc:'Set of 4 reusable, freezer & microwave safe bags.', price:850, category:'Storage', badge:'', image:'' },
+    { id:4, name:'Electric Spin Scrubber', desc:'360° rotating brush. Cleans tiles, tubs & grout fast.', price:2499, category:'Cleaning', badge:'Top Rated', image:'' },
+    { id:5, name:'Foldable Dish Rack', desc:'Space-saving stainless rack with removable drip tray.', price:1100, category:'Kitchen', badge:'', image:'' },
+    { id:6, name:'Digital Kitchen Scale', desc:'Accurate to 1g. Max 5kg. Sleek slim-profile design.', price:950, category:'Appliances', badge:'', image:'' },
+    { id:7, name:'Magnetic Spice Rack', desc:'Set of 6 wall-mounted tins. Easy label windows.', price:780, category:'Storage', badge:'New', image:'' },
+    { id:8, name:'Pour-Over Coffee Dripper', desc:'Borosilicate glass. Brew a perfect cup every morning.', price:1350, category:'Drinkware', badge:'', image:'' },
+  ];
+
+  let cart = JSON.parse(localStorage.getItem('name_cart')) || [];
+
+  function saveCart() { localStorage.setItem('name_cart', JSON.stringify(cart)); updateCartUI(); }
+
+  function updateCartUI() {
+    const count = cart.reduce((s,i) => s + i.quantity, 0);
+    document.getElementById('cart-count').innerText = count;
+    document.getElementById('drawer-count').innerText = count;
+    renderDrawer();
+  }
+
+  function renderDrawer() {
+    const el = document.getElementById('drawer-items');
+    const foot = document.getElementById('cart-foot');
+    if (cart.length === 0) {
+      el.innerHTML = `<div class="cart-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.72l1.38-9.28H6"/></svg><p>Your cart is empty</p></div>`;
+      foot.style.display = 'none';
+      return;
+    }
+    foot.style.display = 'block';
+    let total = 0;
+    el.innerHTML = '';
+    cart.forEach((item, idx) => {
+      total += item.price * item.quantity;
+      const d = document.createElement('div');
+      d.className = 'cart-item';
+      d.innerHTML = `
+        <div class="cart-item-img" style="background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:1.4rem">${item.image ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover">` : '📦'}</div>
+        <div class="cart-item-info">
+          <strong>${item.name}</strong>
+          <span>× ${item.quantity}</span>
+        </div>
+        <span class="cart-item-price">PKR ${(item.price * item.quantity).toLocaleString()}</span>
+        <button class="cart-item-remove" onclick="removeFromCart(${idx})">✕</button>`;
+      el.appendChild(d);
+    });
+    document.getElementById('drawer-total').innerText = total.toLocaleString();
+  }
+
+  function addToCart(id) {
+    const p = PRODUCTS.find(x => x.id === id);
+    if (!p) return;
+    const existing = cart.find(x => x.id === id);
+    if (existing) existing.quantity++;
+    else cart.push({ ...p, quantity: 1 });
+    saveCart();
+    openCart();
+  }
+
+  function removeFromCart(idx) {
+    cart.splice(idx, 1);
+    saveCart();
+  }
+
+  function openCart() {
+    document.getElementById('cart-overlay').classList.add('open');
+    document.getElementById('cart-drawer').classList.add('open');
+  }
+  function closeCart() {
+    document.getElementById('cart-overlay').classList.remove('open');
+    document.getElementById('cart-drawer').classList.remove('open');
+  }
+
+  function goCheckout() {
+    localStorage.setItem('name_cart', JSON.stringify(cart));
+    window.location.href = 'checkout.html';
+  }
+
+  function toggleMenu() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+    document.getElementById('hamburger').classList.toggle('open');
+  }
+
+  function filterCategory(cat) {
+    const section = document.getElementById('shop');
+    section.scrollIntoView({ behavior: 'smooth' });
+    renderProducts(cat);
+  }
+
+  function renderProducts(filterCat) {
+    const grid = document.getElementById('product-grid');
+    grid.innerHTML = '';
+    const list = filterCat ? PRODUCTS.filter(p => p.category === filterCat) : PRODUCTS;
+    list.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = `
+        ${p.badge ? `<div class="card-badge">${p.badge}</div>` : ''}
+        <div class="card-img">
+          ${p.image
+            ? `<img src="${p.image}" alt="${p.name}" onerror="this.parentElement.innerHTML='<div class=card-img-placeholder><svg viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'1.5\\'><rect x=\\'3\\' y=\\'3\\' width=\\'18\\' height=\\'18\\' rx=\\'2\\'/><path d=\\'M3 9h18M9 21V9\\'/></svg><span>No Image</span></div>'">`
+            : `<div class="card-img-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>No Image</span></div>`}
+        </div>
+        <div class="card-body">
+          <h3>${p.name}</h3>
+          <p>${p.desc}</p>
+          <div class="card-footer">
+            <span class="price">PKR ${p.price.toLocaleString()}</span>
+            <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  // Init
+  renderProducts();
+  updateCartUI();
+</script>
+</body>
+</html>

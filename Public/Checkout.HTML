@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | NAME</title>
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --grey-100: #f5f5f5;
+      --grey-200: #e8e8e8;
+      --grey-400: #aaaaaa;
+      --grey-600: #555555;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; min-height: 100%; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--grey-100); color: var(--black); overflow-x: hidden; min-height: 100vh; }
+
+    .ann { background: var(--black); color: var(--white); text-align: center; padding: 9px 16px; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; }
+
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--white); border-bottom: 1px solid var(--grey-200);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 60px;
+    }
+    .nav-logo { font-size: 1.25rem; font-weight: 900; letter-spacing: -1px; color: var(--black); text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--black); border-radius: 1px; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-links-desktop { display: flex; gap: 28px; list-style: none; }
+    .nav-links-desktop a { font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); text-decoration: none; }
+    .mobile-menu { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--white); border-bottom: 1px solid var(--grey-200); z-index: 199; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { padding: 14px 5%; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--grey-200); }
+
+    /* Checkout */
+    .checkout-wrapper { max-width: 1060px; margin: 0 auto; padding: 32px 20px 80px; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--black); text-decoration: none; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 28px; transition: color 0.2s; }
+    .back-link:hover { color: var(--grey-600); }
+
+    .checkout-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+
+    /* Cards */
+    .form-card { background: var(--white); padding: 24px; margin-bottom: 16px; border: 1px solid var(--grey-200); }
+    .card-title { font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--grey-400); border-bottom: 1px solid var(--grey-200); padding-bottom: 12px; margin-bottom: 18px; }
+
+    input[type="text"], input[type="tel"], input[type="email"], textarea, select {
+      width: 100%; padding: 13px 14px; margin-bottom: 12px;
+      border: 1px solid var(--grey-200); background: var(--white);
+      font-family: inherit; font-size: 0.85rem; font-weight: 400; color: var(--black);
+      outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--black); }
+    textarea { resize: vertical; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .two-col input { margin-bottom: 0; }
+
+    .bank-details { display: none; background: var(--grey-100); border: 1px solid var(--grey-200); padding: 14px; font-size: 0.8rem; font-weight: 400; line-height: 2; margin-bottom: 12px; }
+    .bank-details strong { font-weight: 700; }
+
+    /* Summary */
+    .summary-box { background: var(--white); border: 1px solid var(--grey-200); padding: 24px; position: sticky; top: 80px; }
+    .item-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--grey-200); }
+    .item-thumb { width: 52px; height: 52px; background: var(--grey-100); flex-shrink: 0; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .item-info { flex: 1; min-width: 0; }
+    .item-info strong { display: block; font-size: 0.8rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .item-info span { font-size: 0.7rem; color: var(--grey-600); font-weight: 400; }
+    .item-price { font-size: 0.85rem; font-weight: 900; white-space: nowrap; flex-shrink: 0; }
+
+    .divider { border: none; border-top: 1px solid var(--grey-200); margin: 16px 0; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
+    .summary-row span:first-child { color: var(--grey-600); font-weight: 400; }
+    .total-row { display: flex; justify-content: space-between; font-size: 1rem; font-weight: 900; margin: 14px 0 4px; }
+    .free-ship { font-size: 0.68rem; color: var(--grey-600); font-weight: 400; margin-bottom: 18px; }
+
+    .btn-confirm { width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px; font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+    .btn-confirm:hover { background: var(--grey-600); }
+    .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Trust badges */
+    .trust { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+    .trust-item { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--grey-600); font-weight: 400; }
+
+    footer { background: var(--black); color: var(--white); text-align: center; padding: 24px; font-size: 0.75rem; font-weight: 400; position: relative; z-index: 1; }
+    footer a { color: rgba(255,255,255,0.5); text-decoration: none; margin-left: 12px; }
+
+    .wa-fab { position: fixed; bottom: 24px; right: 24px; background: #25D366; color: white; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 250; text-decoration: none; transition: transform 0.2s; }
+    .wa-fab:hover { transform: scale(1.1); }
+
+    @media (max-width: 800px) {
+      .checkout-grid { grid-template-columns: 1fr; gap: 0; }
+      .summary-col { order: -1; margin-bottom: 16px; }
+      .summary-box { position: static; }
+    }
+    @media (max-width: 650px) {
+      nav { padding: 0 4%; position: relative; }
+      .nav-links-desktop { display: none; }
+      .hamburger { display: flex; }
+      .checkout-wrapper { padding: 20px 14px 100px; }
+      .form-card { padding: 16px; }
+      .summary-box { padding: 16px; }
+      input[type="text"], input[type="tel"], input[type="email"], textarea, select { font-size: 16px; }
+      .two-col { grid-template-columns: 1fr; gap: 0; }
+      .two-col input { margin-bottom: 12px; }
+      .wa-fab { width: 46px; height: 46px; bottom: 18px; right: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="ann">🚚 Free delivery on orders over PKR 1,499 &nbsp;|&nbsp; COD Available Nationwide</div>
+
+<nav id="main-nav">
+  <a href="index.html" class="nav-logo">NAME</a>
+  <ul class="nav-links-desktop">
+    <li><a href="index.html#shop">Shop</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="index.html#about">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html#shop">Shop</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="index.html#about">About</a>
+  </div>
+</nav>
+
+<div class="checkout-wrapper">
+  <a href="index.html" class="back-link">← Back to Shop</a>
+
+  <div class="checkout-grid">
+
+    <!-- Form -->
+    <div class="form-col">
+      <div class="form-card">
+        <p class="card-title">Delivery Details</p>
+        <input type="text"  id="name"    placeholder="Full Name *">
+        <input type="tel"   id="phone"   placeholder="Mobile Number * (e.g. 03001234567)">
+        <input type="email" id="email"   placeholder="Email Address (Optional)">
+        <textarea id="address" rows="3"  placeholder="House No., Street, Block / Area *"></textarea>
+        <div class="two-col">
+          <input type="text" id="city"     placeholder="City *">
+          <input type="text" id="landmark" placeholder="Nearest Landmark">
+        </div>
+      </div>
+
+      <div class="form-card">
+        <p class="card-title">Payment Method</p>
+        <select id="payment-method" onchange="toggleBank(this)">
+          <option value="Cash on Delivery">Cash on Delivery (COD)</option>
+          <option value="Online Transfer">Online Bank Transfer / JazzCash</option>
+        </select>
+        <div class="bank-details" id="bank-details">
+          <strong>Bank:</strong> JazzCash<br>
+          <strong>Account No:</strong> 03XX XXXXXXX<br>
+          <strong>Account Name:</strong> NAME Store<br>
+          <strong>Note:</strong> Send transfer screenshot to WhatsApp after payment.
+        </div>
+      </div>
+
+      <div class="form-card" style="background:var(--grey-100); border-color:var(--grey-200);">
+        <p class="card-title">Order Notes</p>
+        <textarea id="notes" rows="2" placeholder="Any special instructions? (Optional)" style="margin-bottom:0;"></textarea>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-col">
+      <div class="summary-box">
+        <p class="card-title">Order Summary</p>
+        <div id="summary-items"></div>
+        <hr class="divider">
+        <div class="summary-row"><span>Subtotal</span><span>PKR <span id="subtotal-val">0</span></span></div>
+        <div class="summary-row"><span>Shipping</span><span id="shipping-val">PKR 200</span></div>
+        <div class="total-row"><span>Total</span><span>PKR <span id="final-total">0</span></span></div>
+        <p class="free-ship" id="free-ship-note">Add PKR <span id="free-remaining">0</span> more for free shipping</p>
+        <button class="btn-confirm" id="submit-btn" onclick="confirmOrder()">Confirm Order</button>
+        <div class="trust">
+          <span class="trust-item">✓ Cash on Delivery</span>
+          <span class="trust-item">✓ 7-Day Returns</span>
+          <span class="trust-item">✓ Secure Checkout</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 NAME — All Rights Reserved
+    <a href="policy.html">Return Policy</a>
+    <a href="index.html">Home</a>
+  </p>
+</footer>
+
+<a href="https://wa.me/923000000000" target="_blank" class="wa-fab" aria-label="WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+  const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/api'
+    : 'https://your-new-railway-url.up.railway.app/api'; // ← update this
+  const FREE_SHIPPING_THRESHOLD = 1499;
+  const SHIPPING_FEE = 200;
+
+  const cart = JSON.parse(localStorage.getItem('name_cart')) || [];
+  if (cart.length === 0) window.location.href = 'index.html';
+
+  function toggleMenu() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+    document.getElementById('hamburger').classList.toggle('open');
+  }
+
+  function toggleBank(sel) {
+    document.getElementById('bank-details').style.display = sel.value === 'Online Transfer' ? 'block' : 'none';
+  }
+
+  // Build summary
+  let subtotal = 0;
+  const summaryEl = document.getElementById('summary-items');
+  cart.forEach(item => {
+    subtotal += item.price * item.quantity;
+    const el = document.createElement('div');
+    el.className = 'item-row';
+    el.innerHTML = `
+      <div class="item-thumb">${item.image ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='📦'">` : '📦'}</div>
+      <div class="item-info">
+        <strong>${item.name}</strong>
+        <span>× ${item.quantity}</span>
+      </div>
+      <span class="item-price">PKR ${(item.price * item.quantity).toLocaleString()}</span>`;
+    summaryEl.appendChild(el);
+  });
+
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const finalTotal = subtotal + shipping;
+
+  document.getElementById('subtotal-val').innerText = subtotal.toLocaleString();
+  document.getElementById('shipping-val').innerText = shipping === 0 ? 'FREE 🎉' : `PKR ${shipping.toLocaleString()}`;
+  document.getElementById('final-total').innerText = finalTotal.toLocaleString();
+
+  if (subtotal >= FREE_SHIPPING_THRESHOLD) {
+    document.getElementById('free-ship-note').innerHTML = '🎉 You qualify for free shipping!';
+  } else {
+    document.getElementById('free-remaining').innerText = (FREE_SHIPPING_THRESHOLD - subtotal).toLocaleString();
+  }
+
+  async function confirmOrder() {
+    const btn = document.getElementById('submit-btn');
+    const data = {
+      customerName:  document.getElementById('name').value.trim(),
+      customerPhone: document.getElementById('phone').value.trim(),
+      customerEmail: document.getElementById('email').value.trim(),
+      address:       document.getElementById('address').value.trim(),
+      city:          document.getElementById('city').value.trim(),
+      landmark:      document.getElementById('landmark').value.trim(),
+      notes:         document.getElementById('notes').value.trim(),
+      paymentMethod: document.getElementById('payment-method').value,
+      orderSummary:  cart,
+      subtotal, shipping, total: finalTotal,
+    };
+
+    if (!data.customerName || !data.customerPhone || !data.address || !data.city) {
+      alert('Please fill in all required fields (*).');
+      return;
+    }
+
+    try {
+      btn.innerText = 'Placing Order…';
+      btn.disabled = true;
+      const res = await fetch(`${API_URL}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        localStorage.removeItem('name_cart');
+        alert('Order Placed Successfully! 🎉 We will contact you shortly.');
+        window.location.href = 'index.html';
+      } else {
+        alert('Something went wrong. Please try again or contact us on WhatsApp.');
+      }
+    } catch (e) {
+      alert('Server error. Please try again or contact us on WhatsApp.');
+    }
+    btn.innerText = 'Confirm Order';
+    btn.disabled = false;
+  }
+</script>
+</body>
+</html>
