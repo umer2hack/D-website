@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const { google } = require('googleapis');
 
 dotenv.config();
 
@@ -16,6 +17,47 @@ app.use(express.static('public')); // serve your HTML files from /public
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB error:', err));
+
+// ── Google Sheets Setup ──
+// Reads credentials from .env — never hardcode these values here.
+const sheetsAuth = new google.auth.JWT(
+  process.env.GOOGLE_CLIENT_EMAIL,
+  null,
+  (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+  ['https://www.googleapis.com/auth/spreadsheets']
+);
+
+const sheets = google.sheets({ version: 'v4', auth: sheetsAuth });
+const SHEET_ID = process.env.GOOGLE_SHEET_ID;
+
+// Appends one order as a new row. Columns match your sheet headers:
+// Date, Order ID, Customer Name, Phone Number, City, Address, Landmark, Payment Method, Total Amount
+async function appendOrderToSheet(order) {
+  try {
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: 'Sheet1!A:I', // change 'Sheet1' if your tab has a different name
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [[
+          new Date(order.createdAt || Date.now()).toLocaleString(),
+          order._id.toString(),
+          order.customerName,
+          order.customerPhone,
+          order.city,
+          order.address,
+          order.landmark || '',
+          order.paymentMethod,
+          order.total,
+        ]],
+      },
+    });
+    console.log(`📝 Order ${order._id} written to Google Sheet`);
+  } catch (err) {
+    // We log but never throw — a Sheets failure should not block the order itself
+    console.error('❌ Google Sheets append error:', err.message);
+  }
+}
 
 // ── Order Schema ──
 const orderSchema = new mongoose.Schema({
@@ -59,6 +101,10 @@ app.post('/api/orders', async (req, res) => {
     const order = new Order(req.body);
     await order.save();
     console.log(`📦 New order from ${order.customerName} — PKR ${order.total}`);
+
+    // Fire-and-forget: don't make the customer wait on Sheets before getting their confirmation
+    appendOrderToSheet(order);
+
     res.status(201).json({ success: true, orderId: order._id });
   } catch (err) {
     console.error('Order error:', err);
