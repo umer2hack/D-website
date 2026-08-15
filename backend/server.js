@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const { google } = require('googleapis');
 
 dotenv.config();
@@ -11,7 +12,14 @@ const app = express();
 // ── Middleware ──
 app.use(cors());
 app.use(express.json({ limit: '2mb' })); // bulk product payloads are JSON-only (no image bytes), but bumped just in case
-app.use(express.static('public')); // serve your HTML files from /public
+
+// Serve your storefront pages (checkout.html, index.html, etc.) from the
+// sibling "Public" folder, and admin.html from the sibling "admin" folder.
+// Both live one level up from this file (D-website/Public and D-website/admin),
+// not inside backend/ — this only affects your LOCAL server, it has no effect
+// on your two separate Vercel deployments.
+app.use(express.static(path.join(__dirname, '..', 'Public')));
+app.use(express.static(path.join(__dirname, '..', 'admin')));
 
 // ── MongoDB Connection ──
 mongoose.connect(process.env.MONGO_URI)
