@@ -451,8 +451,18 @@
 </a>
 
 <script>
-  // ── SAMPLE PRODUCTS (replace with your real data) ──
-  const PRODUCTS = [
+  // ── CONFIG ──
+  // Same auto-switching pattern as admin.html and checkout.html — no changes
+  // needed here once Railway is live; just update the placeholder URL below
+  // in all three files at once.
+  const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/api'
+    : 'https://your-new-railway-url.up.railway.app/api'; // ← update this once Railway is live
+
+  // ── PRODUCTS (loaded from the backend; falls back to this sample list only
+  // if the API can't be reached, e.g. on the live site before Railway is set up) ──
+  let PRODUCTS = [];
+  const SAMPLE_PRODUCTS = [
     { id:1, name:'Stainless Vacuum Flask 510ml', desc:'Keeps drinks hot 12hr / cold 24hr. Leak-proof lid.', price:1200, category:'Drinkware', badge:'Best Seller', image:'' },
     { id:2, name:'Vegetable Chopper Pro', desc:'6-blade rotating chopper. Saves 10 min of prep time.', price:1599, category:'Kitchen', badge:'New', image:'' },
     { id:3, name:'Silicone Food Storage Bags', desc:'Set of 4 reusable, freezer & microwave safe bags.', price:850, category:'Storage', badge:'', image:'' },
@@ -503,9 +513,10 @@
   }
 
   function addToCart(id) {
-    const p = PRODUCTS.find(x => x.id === id);
+    const p = PRODUCTS.find(x => (x._id || x.id) === id);
     if (!p) return;
-    const existing = cart.find(x => x.id === id);
+    const pid = p._id || p.id;
+    const existing = cart.find(x => (x._id || x.id) === pid);
     if (existing) existing.quantity++;
     else cart.push({ ...p, quantity: 1 });
     saveCart();
@@ -542,11 +553,25 @@
     renderProducts(cat);
   }
 
+  // Fetch products from the backend. Falls back to the sample list above if
+  // the API can't be reached (e.g. viewing the live site before Railway is live).
+  async function loadProducts() {
+    try {
+      const res = await fetch(`${API_URL}/products`);
+      const data = await res.json();
+      PRODUCTS = Array.isArray(data) && data.length ? data : SAMPLE_PRODUCTS;
+    } catch (e) {
+      PRODUCTS = SAMPLE_PRODUCTS;
+    }
+    renderProducts();
+  }
+
   function renderProducts(filterCat) {
     const grid = document.getElementById('product-grid');
     grid.innerHTML = '';
     const list = filterCat ? PRODUCTS.filter(p => p.category === filterCat) : PRODUCTS;
     list.forEach(p => {
+      const pid = p._id || p.id;
       const card = document.createElement('div');
       card.className = 'product-card';
       card.innerHTML = `
@@ -560,8 +585,8 @@
           <h3>${p.name}</h3>
           <p>${p.desc}</p>
           <div class="card-footer">
-            <span class="price">PKR ${p.price.toLocaleString()}</span>
-            <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+            <span class="price">PKR ${Number(p.price).toLocaleString()}</span>
+            <button class="add-btn" onclick='addToCart(${JSON.stringify(pid)})'>Add to Cart</button>
           </div>
         </div>`;
       grid.appendChild(card);
@@ -569,7 +594,7 @@
   }
 
   // Init
-  renderProducts();
+  loadProducts();
   updateCartUI();
 </script>
 </body>
