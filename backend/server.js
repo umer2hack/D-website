@@ -94,6 +94,7 @@ const productSchema = new mongoose.Schema({
   category: { type: String, default: 'Kitchen' },
   badge:    { type: String, default: '' },
   image:    { type: String, default: '' }, // Cloudinary secure_url — uploaded directly from the browser
+  video:    { type: String, default: '' }, // Optional Cloudinary video URL — shown as a swipe-to slide in the expand modal
   active:   { type: Boolean, default: true },
 }, { timestamps: true });
 
