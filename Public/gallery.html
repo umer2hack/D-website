@@ -47,8 +47,21 @@
     .page-header p { font-size: 0.68rem; letter-spacing: 4px; text-transform: uppercase; color: var(--grey-400); margin-bottom: 10px; }
     .page-header h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; letter-spacing: -2px; }
 
+    /* Search bar */
+    .search-wrap { padding: 20px 5% 0; }
+    .search-box { position: relative; max-width: 420px; }
+    .search-box input {
+      width: 100%; padding: 12px 16px 12px 40px; border: 1px solid var(--grey-200);
+      font-family: inherit; font-size: 0.85rem; outline: none; transition: border-color 0.2s;
+      background: var(--grey-100);
+    }
+    .search-box input:focus { border-color: var(--black); background: var(--white); }
+    .search-box svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--grey-400); pointer-events: none; }
+    .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--grey-400); font-size: 1rem; display: none; }
+    .search-clear.show { display: block; }
+
     /* Filter tabs */
-    .filters { display: flex; gap: 0; padding: 0 5%; border-bottom: 1px solid var(--grey-200); overflow-x: auto; scrollbar-width: none; }
+    .filters { display: flex; gap: 0; padding: 18px 5% 0; border-bottom: 1px solid var(--grey-200); overflow-x: auto; scrollbar-width: none; }
     .filters::-webkit-scrollbar { display: none; }
     .filter-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 16px 20px; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: var(--grey-400); transition: all 0.2s; white-space: nowrap; margin-bottom: -1px; }
     .filter-btn:hover { color: var(--black); }
@@ -57,9 +70,9 @@
     /* Gallery grid */
     .gallery-grid { columns: 3; column-gap: 1px; padding: 1px 5% 60px; background: var(--grey-200); }
     .gallery-item { break-inside: avoid; margin-bottom: 1px; position: relative; overflow: hidden; cursor: pointer; background: var(--white); }
-    .gallery-item img { width: 100%; display: block; transition: transform 0.4s ease; }
+    .gallery-item img { width: 100%; display: block; transition: transform 0.4s ease; aspect-ratio: 1/1; object-fit: cover; }
     .gallery-item:hover img { transform: scale(1.04); }
-    .gallery-placeholder { background: var(--grey-100); aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--grey-400); transition: background 0.2s; }
+    .gallery-placeholder { background: var(--grey-100); aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--grey-400); transition: background 0.2s; padding: 16px; text-align: center; }
     .gallery-item:hover .gallery-placeholder { background: var(--grey-200); }
     .gallery-placeholder svg { width: 32px; height: 32px; opacity: 0.3; }
     .gallery-placeholder span { font-size: 0.7rem; letter-spacing: 1px; }
@@ -69,25 +82,42 @@
     .gallery-item:hover .gallery-info { opacity: 1; transform: translateY(0); }
     .gallery-info h3 { font-size: 0.85rem; font-weight: 700; color: white; margin-bottom: 2px; }
     .gallery-info span { font-size: 0.72rem; color: rgba(255,255,255,0.75); }
-
-    /* Lightbox */
-    .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
-    .lightbox.open { display: flex; }
-    .lightbox-inner { position: relative; max-width: 700px; width: 100%; }
-    .lightbox-img { width: 100%; max-height: 80vh; object-fit: contain; display: block; }
-    .lightbox-placeholder { background: var(--grey-100); width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--grey-400); }
-    .lightbox-close { position: absolute; top: -44px; right: 0; background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; line-height: 1; }
-    .lightbox-caption { color: white; margin-top: 14px; }
-    .lightbox-caption h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
-    .lightbox-caption p { font-size: 0.78rem; color: rgba(255,255,255,0.6); font-weight: 400; }
-    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border: none; color: white; width: 44px; height: 44px; font-size: 1.2rem; cursor: pointer; transition: background 0.2s; }
-    .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
-    .lightbox-prev { left: -56px; }
-    .lightbox-next { right: -56px; }
+    .gallery-video-tag { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 8px; display: flex; align-items: center; gap: 4px; }
+    .gallery-video-tag svg { width: 10px; height: 10px; }
 
     /* Empty state */
     .gallery-empty { display: none; padding: 60px 5%; text-align: center; color: var(--grey-400); }
     .gallery-empty p { font-size: 0.85rem; letter-spacing: 1px; }
+    .gallery-loading { padding: 60px 5%; text-align: center; color: var(--grey-400); font-size: 0.8rem; letter-spacing: 1px; }
+
+    /* ── EXPAND MODAL ── */
+    .expand-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
+    .expand-overlay.open { display: flex; }
+    .expand-modal { position: relative; max-width: 920px; width: 100%; max-height: 90vh; background: var(--white); display: flex; overflow: hidden; }
+    .expand-close { position: absolute; top: 14px; right: 14px; z-index: 20; background: rgba(0,0,0,0.55); border: none; color: white; width: 34px; height: 34px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .expand-close:hover { background: rgba(0,0,0,0.8); }
+
+    .expand-stage { flex: 1 1 55%; position: relative; background: var(--grey-100); overflow: hidden; touch-action: pan-y; user-select: none; min-height: 320px; }
+    .expand-track { display: flex; height: 100%; transition: transform 0.32s cubic-bezier(.4,0,.2,1); }
+    .expand-slide { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .expand-slide img, .expand-slide video { width: 100%; height: 100%; object-fit: contain; background: var(--grey-100); }
+    .expand-nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.35); border: none; color: white; width: 38px; height: 38px; font-size: 1.1rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .expand-nav-arrow:hover { background: rgba(0,0,0,0.6); }
+    .expand-nav-prev { left: 10px; }
+    .expand-nav-next { right: 10px; }
+    .expand-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 10; }
+    .expand-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.25); cursor: pointer; transition: background 0.2s, transform 0.2s; }
+    .expand-dot.active { background: var(--black); transform: scale(1.3); }
+    .expand-swipe-hint { position: absolute; top: 14px; left: 14px; z-index: 10; background: rgba(0,0,0,0.5); color: white; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; padding: 5px 9px; display: flex; align-items: center; gap: 5px; opacity: 0.9; }
+
+    .expand-info { flex: 1 1 45%; padding: 32px 30px; display: flex; flex-direction: column; overflow-y: auto; }
+    .expand-cat { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-400); margin-bottom: 10px; }
+    .expand-name { font-size: 1.35rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 12px; }
+    .expand-desc { font-size: 0.85rem; color: var(--grey-600); line-height: 1.7; font-weight: 400; margin-bottom: 22px; }
+    .expand-price { font-size: 1.6rem; font-weight: 900; margin-bottom: 22px; }
+    .expand-addcart { background: var(--black); color: var(--white); border: none; padding: 15px; font-family: inherit; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.2s; margin-top: auto; }
+    .expand-addcart:hover { background: var(--grey-600); }
+    .expand-addcart.added { background: var(--grey-600); }
 
     footer { background: var(--black); color: var(--white); text-align: center; padding: 28px; font-size: 0.75rem; font-weight: 400; }
     footer a { color: rgba(255,255,255,0.5); text-decoration: none; margin-left: 16px; }
@@ -103,9 +133,15 @@
       .hamburger { display: flex; }
       .cart-btn span:not(.badge) { display: none; }
       .gallery-grid { columns: 2; padding: 1px 4% 40px; }
-      .lightbox-prev { left: -40px; }
-      .lightbox-next { right: -40px; }
       .page-header { padding: 36px 5% 28px; }
+      .search-wrap { padding: 16px 4% 0; }
+      .filters { padding: 14px 4% 0; }
+
+      .expand-modal { flex-direction: column; max-height: 94vh; }
+      .expand-stage { flex: 0 0 260px; min-height: 260px; }
+      .expand-info { padding: 22px 20px 26px; }
+      .expand-name { font-size: 1.1rem; }
+      .expand-price { font-size: 1.3rem; }
     }
     @media (max-width: 400px) { .gallery-grid { columns: 1; } }
   </style>
@@ -145,26 +181,48 @@
   <h1>Product Gallery</h1>
 </div>
 
-<div class="filters" id="filters">
-  <button class="filter-btn active" onclick="filterGallery('all', this)">All</button>
-  <button class="filter-btn" onclick="filterGallery('Kitchen', this)">Kitchen</button>
-  <button class="filter-btn" onclick="filterGallery('Storage', this)">Storage</button>
-  <button class="filter-btn" onclick="filterGallery('Cleaning', this)">Cleaning</button>
-  <button class="filter-btn" onclick="filterGallery('Appliances', this)">Appliances</button>
-  <button class="filter-btn" onclick="filterGallery('Drinkware', this)">Drinkware</button>
+<div class="search-wrap">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input id="gallery-search" type="text" placeholder="Search products…" oninput="onSearchInput()">
+    <button class="search-clear" id="search-clear-btn" onclick="clearSearch()">✕</button>
+  </div>
 </div>
 
-<div class="gallery-grid" id="gallery-grid"></div>
-<div class="gallery-empty" id="gallery-empty"><p>No items in this category yet.</p></div>
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-cat="all" onclick="filterGallery('all', this)">All</button>
+  <button class="filter-btn" data-cat="Kitchen" onclick="filterGallery('Kitchen', this)">Kitchen</button>
+  <button class="filter-btn" data-cat="Storage" onclick="filterGallery('Storage', this)">Storage</button>
+  <button class="filter-btn" data-cat="Cleaning" onclick="filterGallery('Cleaning', this)">Cleaning</button>
+  <button class="filter-btn" data-cat="Appliances" onclick="filterGallery('Appliances', this)">Appliances</button>
+  <button class="filter-btn" data-cat="Drinkware" onclick="filterGallery('Drinkware', this)">Drinkware</button>
+  <button class="filter-btn" data-cat="Decor" onclick="filterGallery('Decor', this)">Decor</button>
+</div>
 
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
-  <div class="lightbox-inner" id="lightbox-inner">
-    <button class="lightbox-close" onclick="closeLightboxBtn()">✕</button>
-    <button class="lightbox-nav lightbox-prev" onclick="shiftLightbox(-1)">‹</button>
-    <button class="lightbox-nav lightbox-next" onclick="shiftLightbox(1)">›</button>
-    <div id="lightbox-content"></div>
-    <div class="lightbox-caption" id="lightbox-caption"></div>
+<div class="gallery-loading" id="gallery-loading">Loading products…</div>
+<div class="gallery-grid" id="gallery-grid"></div>
+<div class="gallery-empty" id="gallery-empty"><p>No products match your search.</p></div>
+
+<!-- EXPAND MODAL -->
+<div class="expand-overlay" id="expand-overlay" onclick="closeExpandOnOverlay(event)">
+  <div class="expand-modal" id="expand-modal">
+    <button class="expand-close" onclick="closeExpand()">✕</button>
+
+    <div class="expand-stage" id="expand-stage">
+      <div class="expand-swipe-hint" id="expand-swipe-hint" style="display:none;">⟷ Swipe for video</div>
+      <div class="expand-track" id="expand-track"></div>
+      <button class="expand-nav-arrow expand-nav-prev" id="expand-slide-prev" onclick="shiftSlide(-1)" style="display:none;">‹</button>
+      <button class="expand-nav-arrow expand-nav-next" id="expand-slide-next" onclick="shiftSlide(1)" style="display:none;">›</button>
+      <div class="expand-dots" id="expand-dots"></div>
+    </div>
+
+    <div class="expand-info">
+      <div class="expand-cat" id="expand-cat"></div>
+      <div class="expand-name" id="expand-name"></div>
+      <p class="expand-desc" id="expand-desc"></p>
+      <div class="expand-price" id="expand-price"></div>
+      <button class="expand-addcart" id="expand-addcart-btn" onclick="addExpandToCart()">Add to Cart</button>
+    </div>
   </div>
 </div>
 
@@ -180,88 +238,215 @@
 </a>
 
 <script>
-  // Gallery items — add your real images to the `image` field
-  const GALLERY = [
-    { id:1, name:'Vacuum Flask 510ml', category:'Drinkware', image:'', desc:'Stainless steel, keeps hot 12hr' },
-    { id:2, name:'Vegetable Chopper', category:'Kitchen', image:'', desc:'6-blade rotating chopper' },
-    { id:3, name:'Silicone Storage Bags', category:'Storage', image:'', desc:'Set of 4, freezer safe' },
-    { id:4, name:'Spin Scrubber', category:'Cleaning', image:'', desc:'360° electric brush' },
-    { id:5, name:'Dish Rack Foldable', category:'Kitchen', image:'', desc:'Space-saving stainless design' },
-    { id:6, name:'Digital Kitchen Scale', category:'Appliances', image:'', desc:'Accurate to 1g, max 5kg' },
-    { id:7, name:'Magnetic Spice Rack', category:'Storage', image:'', desc:'Set of 6 wall-mounted tins' },
-    { id:8, name:'Pour-Over Dripper', category:'Drinkware', image:'', desc:'Borosilicate glass' },
-    { id:9, name:'Silicone Spatula Set', category:'Kitchen', image:'', desc:'Heat resistant up to 230°C' },
-    { id:10, name:'Vacuum Food Sealer', category:'Appliances', image:'', desc:'Extends food freshness 5×' },
-    { id:11, name:'Microfibre Mop', category:'Cleaning', image:'', desc:'360° spin, hands-free wringing' },
-    { id:12, name:'Glass Lunch Box', category:'Storage', image:'', desc:'Leakproof, oven & microwave safe' },
-  ];
+  // ── CONFIG ──
+  const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/api'
+    : 'https://your-new-railway-url.up.railway.app/api'; // ← update this once Railway is live
 
+  // ── STATE ──
+  let PRODUCTS = [];        // full list fetched from the backend
+  let visibleItems = [];    // currently filtered/searched subset shown in the grid
   let currentFilter = 'all';
-  let currentIndex = 0;
-  let visibleItems = [];
+  let currentSearch = '';
+  let currentProductIndex = 0; // index into visibleItems for the open expand modal
+  let currentSlide = 0;        // 0 = image, 1 = video (if present)
+  let touchStartX = 0;
+  let touchDeltaX = 0;
+  let isDragging = false;
 
-  function renderGallery(filter) {
-    const grid = document.getElementById('gallery-grid');
-    const empty = document.getElementById('gallery-empty');
-    visibleItems = filter === 'all' ? GALLERY : GALLERY.filter(i => i.category === filter);
-    grid.innerHTML = '';
-    if (visibleItems.length === 0) { empty.style.display = 'block'; return; }
-    empty.style.display = 'none';
-    visibleItems.forEach((item, idx) => {
-      const div = document.createElement('div');
-      div.className = 'gallery-item';
-      div.onclick = () => openLightbox(idx);
-      div.innerHTML = item.image
-        ? `<img src="${item.image}" alt="${item.name}" loading="lazy">
-           <div class="gallery-overlay"><div class="gallery-info"><h3>${item.name}</h3><span>${item.category}</span></div></div>`
-        : `<div class="gallery-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>${item.name}</span></div>
-           <div class="gallery-overlay"><div class="gallery-info"><h3>${item.name}</h3><span>${item.category}</span></div></div>`;
-      grid.appendChild(div);
-    });
+  // ── LOAD PRODUCTS FROM BACKEND ──
+  async function loadGallery() {
+    document.getElementById('gallery-loading').style.display = 'block';
+    try {
+      const res = await fetch(`${API_URL}/products`);
+      const data = await res.json();
+      PRODUCTS = Array.isArray(data) ? data : [];
+    } catch (e) {
+      PRODUCTS = [];
+      console.error('Could not load products from backend:', e);
+    }
+    document.getElementById('gallery-loading').style.display = 'none';
+    applyFilters();
+  }
+
+  // ── FILTER + SEARCH ──
+  function applyFilters() {
+    let list = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === currentFilter);
+    if (currentSearch.trim()) {
+      const q = currentSearch.trim().toLowerCase();
+      list = list.filter(p => (p.name || '').toLowerCase().includes(q) || (p.desc || '').toLowerCase().includes(q));
+    }
+    visibleItems = list;
+    renderGallery();
   }
 
   function filterGallery(cat, btn) {
     currentFilter = cat;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    renderGallery(cat);
+    applyFilters();
   }
 
-  function openLightbox(idx) {
-    currentIndex = idx;
-    showLightboxItem();
-    document.getElementById('lightbox').classList.add('open');
+  function onSearchInput() {
+    currentSearch = document.getElementById('gallery-search').value;
+    document.getElementById('search-clear-btn').classList.toggle('show', currentSearch.length > 0);
+    applyFilters();
+  }
+
+  function clearSearch() {
+    currentSearch = '';
+    document.getElementById('gallery-search').value = '';
+    document.getElementById('search-clear-btn').classList.remove('show');
+    applyFilters();
+  }
+
+  // ── RENDER GRID ──
+  function renderGallery() {
+    const grid = document.getElementById('gallery-grid');
+    const empty = document.getElementById('gallery-empty');
+    grid.innerHTML = '';
+    if (visibleItems.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    visibleItems.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = 'gallery-item';
+      div.onclick = () => openExpand(idx);
+      const videoTag = item.video ? `<div class="gallery-video-tag"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Video</div>` : '';
+      div.innerHTML = (item.image
+        ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
+        : `<div class="gallery-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>${item.name}</span></div>`)
+        + videoTag
+        + `<div class="gallery-overlay"><div class="gallery-info"><h3>${item.name}</h3><span>PKR ${Number(item.price).toLocaleString()}</span></div></div>`;
+      grid.appendChild(div);
+    });
+  }
+
+  // ── EXPAND MODAL ──
+  function openExpand(idx) {
+    currentProductIndex = idx;
+    currentSlide = 0;
+    renderExpand();
+    document.getElementById('expand-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
 
-  function showLightboxItem() {
-    const item = visibleItems[currentIndex];
-    const content = document.getElementById('lightbox-content');
-    const caption = document.getElementById('lightbox-caption');
-    content.innerHTML = item.image
-      ? `<img class="lightbox-img" src="${item.image}" alt="${item.name}">`
-      : `<div class="lightbox-placeholder">No image added yet</div>`;
-    caption.innerHTML = `<h3>${item.name}</h3><p>${item.desc} · ${item.category}</p>`;
-  }
-
-  function shiftLightbox(dir) {
-    currentIndex = (currentIndex + dir + visibleItems.length) % visibleItems.length;
-    showLightboxItem();
-  }
-
-  function closeLightbox(e) {
-    if (e.target === document.getElementById('lightbox')) closeLightboxBtn();
-  }
-  function closeLightboxBtn() {
-    document.getElementById('lightbox').classList.remove('open');
+  function closeExpand() {
+    document.getElementById('expand-overlay').classList.remove('open');
     document.body.style.overflow = '';
   }
 
+  function closeExpandOnOverlay(e) {
+    if (e.target === document.getElementById('expand-overlay')) closeExpand();
+  }
+
+  function renderExpand() {
+    const item = visibleItems[currentProductIndex];
+    if (!item) return;
+
+    // Build slides: image always first, video second if present
+    const track = document.getElementById('expand-track');
+    const dotsWrap = document.getElementById('expand-dots');
+    const hint = document.getElementById('expand-swipe-hint');
+    track.innerHTML = '';
+    dotsWrap.innerHTML = '';
+
+    const slides = [];
+    slides.push(item.image
+      ? `<div class="expand-slide"><img src="${item.image}" alt="${item.name}"></div>`
+      : `<div class="expand-slide" style="color:#aaa;font-size:0.8rem;">No image added yet</div>`);
+    if (item.video) {
+      slides.push(`<div class="expand-slide"><video src="${item.video}" controls playsinline></video></div>`);
+    }
+    track.innerHTML = slides.join('');
+    hint.style.display = item.video ? 'flex' : 'none';
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'expand-dot' + (i === 0 ? ' active' : '');
+      dot.onclick = () => { currentSlide = i; updateSlidePosition(); };
+      dotsWrap.appendChild(dot);
+    });
+    dotsWrap.style.display = slides.length > 1 ? 'flex' : 'none';
+
+    currentSlide = 0;
+    updateSlidePosition();
+
+    // Info panel
+    document.getElementById('expand-cat').innerText = item.category || '';
+    document.getElementById('expand-name').innerText = item.name;
+    document.getElementById('expand-desc').innerText = item.desc || '';
+    document.getElementById('expand-price').innerText = 'PKR ' + Number(item.price).toLocaleString();
+    const addBtn = document.getElementById('expand-addcart-btn');
+    addBtn.innerText = 'Add to Cart';
+    addBtn.classList.remove('added');
+
+    // Prev/next product arrows only make sense if there's more than one product
+    document.getElementById('expand-slide-prev').style.display = visibleItems.length > 1 ? 'flex' : 'none';
+    document.getElementById('expand-slide-next').style.display = visibleItems.length > 1 ? 'flex' : 'none';
+  }
+
+  function updateSlidePosition() {
+    const track = document.getElementById('expand-track');
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    document.querySelectorAll('.expand-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+  }
+
+  // Swipe between products (image vs video) within the SAME product
+  function shiftInnerSlide(dir) {
+    const item = visibleItems[currentProductIndex];
+    const maxSlide = item.video ? 1 : 0;
+    let next = currentSlide + dir;
+    if (next < 0) next = 0;
+    if (next > maxSlide) next = maxSlide;
+    currentSlide = next;
+    updateSlidePosition();
+  }
+
+  // Arrow buttons move between different products in the current filtered list
+  function shiftSlide(dir) {
+    currentProductIndex = (currentProductIndex + dir + visibleItems.length) % visibleItems.length;
+    renderExpand();
+  }
+
+  function addExpandToCart() {
+    const item = visibleItems[currentProductIndex];
+    if (!item) return;
+    const pid = item._id || item.id;
+    let cart = JSON.parse(localStorage.getItem('name_cart')) || [];
+    const existing = cart.find(x => (x._id || x.id) === pid);
+    if (existing) existing.quantity++;
+    else cart.push({ ...item, quantity: 1 });
+    localStorage.setItem('name_cart', JSON.stringify(cart));
+    updateCartCount();
+    const btn = document.getElementById('expand-addcart-btn');
+    btn.innerText = 'Added ✓';
+    btn.classList.add('added');
+  }
+
+  // ── TOUCH SWIPE (image ↔ video within one product) ──
+  const stage = document.getElementById('expand-stage');
+  stage.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    isDragging = true;
+  }, { passive: true });
+  stage.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    touchDeltaX = e.touches[0].clientX - touchStartX;
+  }, { passive: true });
+  stage.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    if (Math.abs(touchDeltaX) > 50) {
+      shiftInnerSlide(touchDeltaX < 0 ? 1 : -1);
+    }
+    touchDeltaX = 0;
+  });
+
   document.addEventListener('keydown', e => {
-    if (!document.getElementById('lightbox').classList.contains('open')) return;
-    if (e.key === 'ArrowRight') shiftLightbox(1);
-    if (e.key === 'ArrowLeft') shiftLightbox(-1);
-    if (e.key === 'Escape') closeLightboxBtn();
+    if (!document.getElementById('expand-overlay').classList.contains('open')) return;
+    if (e.key === 'Escape') closeExpand();
+    if (e.key === 'ArrowRight') shiftSlide(1);
+    if (e.key === 'ArrowLeft') shiftSlide(-1);
   });
 
   function toggleMenu() {
@@ -269,11 +454,14 @@
     document.getElementById('hamburger').classList.toggle('open');
   }
 
-  // Cart count
-  const cart = JSON.parse(localStorage.getItem('name_cart')) || [];
-  document.getElementById('cart-count').innerText = cart.reduce((s,i) => s + i.quantity, 0);
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('name_cart')) || [];
+    document.getElementById('cart-count').innerText = cart.reduce((s,i) => s + i.quantity, 0);
+  }
 
-  renderGallery('all');
+  // Init
+  updateCartCount();
+  loadGallery();
 </script>
 </body>
 </html>

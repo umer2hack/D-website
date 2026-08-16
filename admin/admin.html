@@ -95,6 +95,7 @@
     .field-group label { display: block; font-size: 0.68rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--grey-600); margin-bottom: 6px; font-weight: 700; }
     .field-group input, .field-group textarea, .field-group select { width: 100%; padding: 11px 13px; border: 1px solid var(--grey-200); font-family: inherit; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
     .field-group input:focus, .field-group textarea:focus, .field-group select:focus { border-color: var(--black); }
+    .field-group .hint { font-size: 0.68rem; color: var(--grey-400); font-weight: 400; margin-top: 5px; }
     .field-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .modal-foot { display: flex; gap: 10px; justify-content: flex-end; padding: 16px 22px; border-top: 1px solid var(--grey-200); }
     .btn-cancel { background: none; border: 1px solid var(--grey-200); padding: 10px 20px; font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
@@ -262,7 +263,8 @@
           (a direct link, if you already have images hosted somewhere) <strong>or</strong>
           <code>imageFileName</code> (matched exactly, e.g. <code>flask.jpg</code>, against the image
           folder you select below). Images matched by filename are uploaded straight to Cloudinary from
-          your browser — your server never touches the image bytes.
+          your browser — your server never touches the image bytes. You can also add an optional
+          <code>videoUrl</code> column if any rows have a product video.
         </p>
         <div class="field-group">
           <label>Excel File (.xlsx / .xls)</label>
@@ -350,6 +352,11 @@
         <input type="file" id="prod-image-file" accept="image/*" onchange="previewProductImage(event)">
         <div id="prod-image-preview" style="margin-top:8px;"></div>
         <input type="hidden" id="prod-image">
+      </div>
+      <div class="field-group">
+        <label>Product Video URL (optional)</label>
+        <input type="text" id="prod-video" placeholder="Paste a Cloudinary or hosted video link">
+        <p class="hint">Shown as a second swipeable slide on the gallery page, next to the image.</p>
       </div>
     </div>
     <div class="modal-foot">
@@ -576,6 +583,7 @@
       document.getElementById('prod-cat').value = p.category;
       document.getElementById('prod-badge').value = p.badge || '';
       document.getElementById('prod-image').value = p.image || '';
+      document.getElementById('prod-video').value = p.video || '';
       if (p.image) document.getElementById('prod-image-preview').innerHTML = `<img src="${p.image}" style="width:70px;height:70px;object-fit:cover;">`;
     } else {
       document.getElementById('prod-name').value = '';
@@ -584,6 +592,7 @@
       document.getElementById('prod-cat').value = 'Kitchen';
       document.getElementById('prod-badge').value = '';
       document.getElementById('prod-image').value = '';
+      document.getElementById('prod-video').value = '';
     }
     document.getElementById('product-modal').classList.add('open');
   }
@@ -617,6 +626,7 @@
       category: document.getElementById('prod-cat').value,
       badge: document.getElementById('prod-badge').value.trim(),
       image: document.getElementById('prod-image').value.trim(),
+      video: document.getElementById('prod-video').value.trim(),
     };
     try {
       if (editingProdId) {
@@ -725,6 +735,7 @@
         category: row.category || 'Kitchen',
         badge: row.badge || '',
         image: imageUrl,
+        video: row.videoUrl || row.VideoUrl || row.video || '',
       });
     }
 
