@@ -43,9 +43,9 @@
     .mobile-menu a { padding: 14px 5%; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); text-decoration: none; border-bottom: 1px solid var(--grey-200); }
 
     /* Page header */
-    .page-header { padding: 56px 5% 40px; border-bottom: 1px solid var(--grey-200); }
+    .page-header { padding: 40px 5% 24px; border-bottom: 1px solid var(--grey-200); }
     .page-header p { font-size: 0.68rem; letter-spacing: 4px; text-transform: uppercase; color: var(--grey-400); margin-bottom: 10px; }
-    .page-header h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; letter-spacing: -2px; }
+    .page-header h1 { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 900; letter-spacing: -2px; }
 
     /* Search bar */
     .search-wrap { padding: 20px 5% 0; }
@@ -63,40 +63,35 @@
     /* Filter tabs */
     .filters { display: flex; gap: 0; padding: 18px 5% 0; border-bottom: 1px solid var(--grey-200); overflow-x: auto; scrollbar-width: none; }
     .filters::-webkit-scrollbar { display: none; }
-    .filter-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 16px 20px; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: var(--grey-400); transition: all 0.2s; white-space: nowrap; margin-bottom: -1px; }
+    .filter-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 14px 18px; font-family: inherit; font-size: 0.7rem; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; cursor: pointer; color: var(--grey-400); transition: all 0.2s; white-space: nowrap; margin-bottom: -1px; }
     .filter-btn:hover { color: var(--black); }
     .filter-btn.active { color: var(--black); border-bottom-color: var(--black); }
 
-    /* Gallery grid */
-    .gallery-grid { columns: 3; column-gap: 1px; padding: 1px 5% 60px; background: var(--grey-200); }
-    .gallery-item { break-inside: avoid; margin-bottom: 1px; position: relative; overflow: hidden; cursor: pointer; background: var(--white); }
-    .gallery-item img { width: 100%; display: block; transition: transform 0.4s ease; aspect-ratio: 1/1; object-fit: cover; }
-    .gallery-item:hover img { transform: scale(1.04); }
-    .gallery-placeholder { background: var(--grey-100); aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--grey-400); transition: background 0.2s; padding: 16px; text-align: center; }
-    .gallery-item:hover .gallery-placeholder { background: var(--grey-200); }
-    .gallery-placeholder svg { width: 32px; height: 32px; opacity: 0.3; }
-    .gallery-placeholder span { font-size: 0.7rem; letter-spacing: 1px; }
-    .gallery-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0); display: flex; align-items: flex-end; padding: 16px; transition: background 0.3s; }
-    .gallery-item:hover .gallery-overlay { background: rgba(0,0,0,0.35); }
-    .gallery-info { opacity: 0; transform: translateY(8px); transition: all 0.3s; }
-    .gallery-item:hover .gallery-info { opacity: 1; transform: translateY(0); }
-    .gallery-info h3 { font-size: 0.85rem; font-weight: 700; color: white; margin-bottom: 2px; }
-    .gallery-info span { font-size: 0.72rem; color: rgba(255,255,255,0.75); }
-    .gallery-video-tag { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 8px; display: flex; align-items: center; gap: 4px; }
-    .gallery-video-tag svg { width: 10px; height: 10px; }
+    /* ── PRODUCT GRID (same card style as homepage — name & price always visible) ── */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1px; padding: 1px 5% 60px; background: var(--grey-200); }
+    .gallery-card { background: var(--white); cursor: pointer; position: relative; overflow: hidden; }
+    .gallery-card:hover .card-img img { transform: scale(1.04); }
+    .card-img { aspect-ratio: 1/1; overflow: hidden; background: var(--grey-100); display: flex; align-items: center; justify-content: center; position: relative; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .card-img-placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--grey-400); font-size: 0.7rem; letter-spacing: 1px; padding: 10px; text-align: center; }
+    .card-img-placeholder svg { width: 36px; height: 36px; opacity: 0.25; }
+    .card-video-tag { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; font-size: 0.58rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 7px; display: flex; align-items: center; gap: 4px; }
+    .card-video-tag svg { width: 9px; height: 9px; }
+    .card-body { padding: 14px; }
+    .card-body h3 { font-size: 0.85rem; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 6px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-price { font-size: 0.92rem; font-weight: 900; }
 
-    /* Empty state */
+    /* Empty / loading */
     .gallery-empty { display: none; padding: 60px 5%; text-align: center; color: var(--grey-400); }
     .gallery-empty p { font-size: 0.85rem; letter-spacing: 1px; }
     .gallery-loading { padding: 60px 5%; text-align: center; color: var(--grey-400); font-size: 0.8rem; letter-spacing: 1px; }
 
-    /* ── EXPAND MODAL ── */
+    /* ── EXPAND MODAL (same as home) ── */
     .expand-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
     .expand-overlay.open { display: flex; }
     .expand-modal { position: relative; max-width: 920px; width: 100%; max-height: 90vh; background: var(--white); display: flex; overflow: hidden; }
     .expand-close { position: absolute; top: 14px; right: 14px; z-index: 20; background: rgba(0,0,0,0.55); border: none; color: white; width: 34px; height: 34px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .expand-close:hover { background: rgba(0,0,0,0.8); }
-
     .expand-stage { flex: 1 1 55%; position: relative; background: var(--grey-100); overflow: hidden; touch-action: pan-y; user-select: none; min-height: 320px; }
     .expand-track { display: flex; height: 100%; transition: transform 0.32s cubic-bezier(.4,0,.2,1); }
     .expand-slide { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
@@ -109,7 +104,6 @@
     .expand-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.25); cursor: pointer; transition: background 0.2s, transform 0.2s; }
     .expand-dot.active { background: var(--black); transform: scale(1.3); }
     .expand-swipe-hint { position: absolute; top: 14px; left: 14px; z-index: 10; background: rgba(0,0,0,0.5); color: white; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; padding: 5px 9px; display: flex; align-items: center; gap: 5px; opacity: 0.9; }
-
     .expand-info { flex: 1 1 45%; padding: 32px 30px; display: flex; flex-direction: column; overflow-y: auto; }
     .expand-cat { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-400); margin-bottom: 10px; }
     .expand-name { font-size: 1.35rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 12px; }
@@ -126,24 +120,38 @@
     .wa-fab { position: fixed; bottom: 24px; right: 24px; background: #25D366; color: white; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 250; text-decoration: none; transition: transform 0.2s; }
     .wa-fab:hover { transform: scale(1.1); }
 
-    @media (max-width: 900px) { .gallery-grid { columns: 2; } }
+    /* ── MOBILE BOTTOM NAV ── */
+    .mobile-bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 260; background: var(--black); align-items: stretch; padding-bottom: env(safe-area-inset-bottom); }
+    .mobile-bottom-nav .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 9px 4px 8px; color: rgba(255,255,255,0.55); text-decoration: none; font-size: 0.58rem; letter-spacing: 0.5px; text-transform: uppercase; background: none; border: none; font-family: inherit; cursor: pointer; }
+    .mobile-bottom-nav .nav-item.active { color: var(--white); }
+    .mobile-bottom-nav svg { width: 19px; height: 19px; }
+    .mobile-bottom-nav .nav-item .badge-count { position: absolute; margin-top: -18px; margin-left: 10px; background: #25D366; color: white; font-size: 0.55rem; font-weight: 900; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+
+    @media (max-width: 900px) { .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
     @media (max-width: 650px) {
       nav { padding: 0 4%; }
       .nav-links { display: none; }
       .hamburger { display: flex; }
       .cart-btn span:not(.badge) { display: none; }
-      .gallery-grid { columns: 2; padding: 1px 4% 40px; }
-      .page-header { padding: 36px 5% 28px; }
+      .page-header { padding: 28px 4% 20px; }
       .search-wrap { padding: 16px 4% 0; }
       .filters { padding: 14px 4% 0; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; padding: 1px 4% 24px; gap: 1px; }
+      .card-body { padding: 10px; }
+      .card-body h3 { font-size: 0.76rem; margin-bottom: 4px; }
+      .card-price { font-size: 0.82rem; }
 
       .expand-modal { flex-direction: column; max-height: 94vh; }
       .expand-stage { flex: 0 0 260px; min-height: 260px; }
       .expand-info { padding: 22px 20px 26px; }
       .expand-name { font-size: 1.1rem; }
       .expand-price { font-size: 1.3rem; }
+
+      .mobile-bottom-nav { display: flex; }
+      body { padding-bottom: 60px; }
+      .wa-fab { width: 46px; height: 46px; bottom: 74px; right: 16px; }
     }
-    @media (max-width: 400px) { .gallery-grid { columns: 1; } }
+    @media (max-width: 380px) { .gallery-grid { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
@@ -177,8 +185,8 @@
 </nav>
 
 <div class="page-header">
-  <p>Visual Showcase</p>
-  <h1>Product Gallery</h1>
+  <p>Full Catalog</p>
+  <h1>All Products</h1>
 </div>
 
 <div class="search-wrap">
@@ -207,15 +215,13 @@
 <div class="expand-overlay" id="expand-overlay" onclick="closeExpandOnOverlay(event)">
   <div class="expand-modal" id="expand-modal">
     <button class="expand-close" onclick="closeExpand()">✕</button>
-
     <div class="expand-stage" id="expand-stage">
       <div class="expand-swipe-hint" id="expand-swipe-hint" style="display:none;">⟷ Swipe for video</div>
       <div class="expand-track" id="expand-track"></div>
-      <button class="expand-nav-arrow expand-nav-prev" id="expand-slide-prev" onclick="shiftSlide(-1)" style="display:none;">‹</button>
-      <button class="expand-nav-arrow expand-nav-next" id="expand-slide-next" onclick="shiftSlide(1)" style="display:none;">›</button>
+      <button class="expand-nav-arrow expand-nav-prev" id="expand-slide-prev" onclick="shiftProduct(-1)" style="display:none;">‹</button>
+      <button class="expand-nav-arrow expand-nav-next" id="expand-slide-next" onclick="shiftProduct(1)" style="display:none;">›</button>
       <div class="expand-dots" id="expand-dots"></div>
     </div>
-
     <div class="expand-info">
       <div class="expand-cat" id="expand-cat"></div>
       <div class="expand-name" id="expand-name"></div>
@@ -237,6 +243,27 @@
   <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-bottom-nav">
+  <a href="index.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    Home
+  </a>
+  <a href="gallery.html" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    Gallery
+  </a>
+  <button class="nav-item" onclick="document.getElementById('gallery-search').scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('gallery-search').focus();">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    Search
+  </button>
+  <button class="nav-item" onclick="window.location.href='index.html'" style="position:relative;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.72l1.38-9.28H6"/></svg>
+    Cart
+    <span class="badge-count" id="mobile-cart-count" style="display:none;">0</span>
+  </button>
+</div>
+
 <script>
   // ── CONFIG ──
   const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
@@ -244,17 +271,19 @@
     : 'https://your-new-railway-url.up.railway.app/api'; // ← update this once Railway is live
 
   // ── STATE ──
-  let PRODUCTS = [];        // full list fetched from the backend
-  let visibleItems = [];    // currently filtered/searched subset shown in the grid
+  let PRODUCTS = [];
+  let visibleItems = [];
   let currentFilter = 'all';
   let currentSearch = '';
-  let currentProductIndex = 0; // index into visibleItems for the open expand modal
-  let currentSlide = 0;        // 0 = image, 1 = video (if present)
-  let touchStartX = 0;
-  let touchDeltaX = 0;
-  let isDragging = false;
+  let currentProductIndex = 0;
+  let currentSlide = 0;
+  let touchStartX = 0, touchDeltaX = 0, isDragging = false;
 
-  // ── LOAD PRODUCTS FROM BACKEND ──
+  // Read ?category= and ?search= from the URL (used when linking in from home page category tiles)
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialCategory = urlParams.get('category');
+  const initialSearch = urlParams.get('search');
+
   async function loadGallery() {
     document.getElementById('gallery-loading').style.display = 'block';
     try {
@@ -266,10 +295,20 @@
       console.error('Could not load products from backend:', e);
     }
     document.getElementById('gallery-loading').style.display = 'none';
+
+    if (initialCategory) {
+      currentFilter = initialCategory;
+      const btn = document.querySelector(`.filter-btn[data-cat="${initialCategory}"]`);
+      if (btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+    }
+    if (initialSearch) {
+      currentSearch = initialSearch;
+      document.getElementById('gallery-search').value = initialSearch;
+      document.getElementById('search-clear-btn').classList.add('show');
+    }
     applyFilters();
   }
 
-  // ── FILTER + SEARCH ──
   function applyFilters() {
     let list = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === currentFilter);
     if (currentSearch.trim()) {
@@ -292,7 +331,6 @@
     document.getElementById('search-clear-btn').classList.toggle('show', currentSearch.length > 0);
     applyFilters();
   }
-
   function clearSearch() {
     currentSearch = '';
     document.getElementById('gallery-search').value = '';
@@ -300,7 +338,6 @@
     applyFilters();
   }
 
-  // ── RENDER GRID ──
   function renderGallery() {
     const grid = document.getElementById('gallery-grid');
     const empty = document.getElementById('gallery-empty');
@@ -308,15 +345,21 @@
     if (visibleItems.length === 0) { empty.style.display = 'block'; return; }
     empty.style.display = 'none';
     visibleItems.forEach((item, idx) => {
+      const videoTag = item.video ? `<div class="card-video-tag"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Video</div>` : '';
       const div = document.createElement('div');
-      div.className = 'gallery-item';
+      div.className = 'gallery-card';
       div.onclick = () => openExpand(idx);
-      const videoTag = item.video ? `<div class="gallery-video-tag"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Video</div>` : '';
-      div.innerHTML = (item.image
-        ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
-        : `<div class="gallery-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>${item.name}</span></div>`)
-        + videoTag
-        + `<div class="gallery-overlay"><div class="gallery-info"><h3>${item.name}</h3><span>PKR ${Number(item.price).toLocaleString()}</span></div></div>`;
+      div.innerHTML = `
+        <div class="card-img">
+          ${item.image
+            ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
+            : `<div class="card-img-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>${item.name}</span></div>`}
+          ${videoTag}
+        </div>
+        <div class="card-body">
+          <h3>${item.name}</h3>
+          <span class="card-price">PKR ${Number(item.price).toLocaleString()}</span>
+        </div>`;
       grid.appendChild(div);
     });
   }
@@ -329,12 +372,10 @@
     document.getElementById('expand-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
-
   function closeExpand() {
     document.getElementById('expand-overlay').classList.remove('open');
     document.body.style.overflow = '';
   }
-
   function closeExpandOnOverlay(e) {
     if (e.target === document.getElementById('expand-overlay')) closeExpand();
   }
@@ -342,24 +383,19 @@
   function renderExpand() {
     const item = visibleItems[currentProductIndex];
     if (!item) return;
-
-    // Build slides: image always first, video second if present
     const track = document.getElementById('expand-track');
     const dotsWrap = document.getElementById('expand-dots');
     const hint = document.getElementById('expand-swipe-hint');
-    track.innerHTML = '';
-    dotsWrap.innerHTML = '';
 
     const slides = [];
     slides.push(item.image
       ? `<div class="expand-slide"><img src="${item.image}" alt="${item.name}"></div>`
       : `<div class="expand-slide" style="color:#aaa;font-size:0.8rem;">No image added yet</div>`);
-    if (item.video) {
-      slides.push(`<div class="expand-slide"><video src="${item.video}" controls playsinline></video></div>`);
-    }
+    if (item.video) slides.push(`<div class="expand-slide"><video src="${item.video}" controls playsinline></video></div>`);
     track.innerHTML = slides.join('');
     hint.style.display = item.video ? 'flex' : 'none';
 
+    dotsWrap.innerHTML = '';
     slides.forEach((_, i) => {
       const dot = document.createElement('div');
       dot.className = 'expand-dot' + (i === 0 ? ' active' : '');
@@ -371,7 +407,6 @@
     currentSlide = 0;
     updateSlidePosition();
 
-    // Info panel
     document.getElementById('expand-cat').innerText = item.category || '';
     document.getElementById('expand-name').innerText = item.name;
     document.getElementById('expand-desc').innerText = item.desc || '';
@@ -380,30 +415,25 @@
     addBtn.innerText = 'Add to Cart';
     addBtn.classList.remove('added');
 
-    // Prev/next product arrows only make sense if there's more than one product
     document.getElementById('expand-slide-prev').style.display = visibleItems.length > 1 ? 'flex' : 'none';
     document.getElementById('expand-slide-next').style.display = visibleItems.length > 1 ? 'flex' : 'none';
   }
 
   function updateSlidePosition() {
-    const track = document.getElementById('expand-track');
-    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    document.getElementById('expand-track').style.transform = `translateX(-${currentSlide * 100}%)`;
     document.querySelectorAll('.expand-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
   }
 
-  // Swipe between products (image vs video) within the SAME product
+  // Swipe = image ↔ video within the SAME product
   function shiftInnerSlide(dir) {
     const item = visibleItems[currentProductIndex];
     const maxSlide = item.video ? 1 : 0;
-    let next = currentSlide + dir;
-    if (next < 0) next = 0;
-    if (next > maxSlide) next = maxSlide;
-    currentSlide = next;
+    currentSlide = Math.max(0, Math.min(maxSlide, currentSlide + dir));
     updateSlidePosition();
   }
 
-  // Arrow buttons move between different products in the current filtered list
-  function shiftSlide(dir) {
+  // Arrow buttons = move between different products
+  function shiftProduct(dir) {
     currentProductIndex = (currentProductIndex + dir + visibleItems.length) % visibleItems.length;
     renderExpand();
   }
@@ -423,30 +453,20 @@
     btn.classList.add('added');
   }
 
-  // ── TOUCH SWIPE (image ↔ video within one product) ──
   const stage = document.getElementById('expand-stage');
-  stage.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
-    isDragging = true;
-  }, { passive: true });
-  stage.addEventListener('touchmove', e => {
-    if (!isDragging) return;
-    touchDeltaX = e.touches[0].clientX - touchStartX;
-  }, { passive: true });
+  stage.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; isDragging = true; }, { passive: true });
+  stage.addEventListener('touchmove', e => { if (isDragging) touchDeltaX = e.touches[0].clientX - touchStartX; }, { passive: true });
   stage.addEventListener('touchend', () => {
     if (!isDragging) return;
     isDragging = false;
-    if (Math.abs(touchDeltaX) > 50) {
-      shiftInnerSlide(touchDeltaX < 0 ? 1 : -1);
-    }
+    if (Math.abs(touchDeltaX) > 50) shiftInnerSlide(touchDeltaX < 0 ? 1 : -1);
     touchDeltaX = 0;
   });
-
   document.addEventListener('keydown', e => {
     if (!document.getElementById('expand-overlay').classList.contains('open')) return;
     if (e.key === 'Escape') closeExpand();
-    if (e.key === 'ArrowRight') shiftSlide(1);
-    if (e.key === 'ArrowLeft') shiftSlide(-1);
+    if (e.key === 'ArrowRight') shiftProduct(1);
+    if (e.key === 'ArrowLeft') shiftProduct(-1);
   });
 
   function toggleMenu() {
@@ -456,10 +476,12 @@
 
   function updateCartCount() {
     const cart = JSON.parse(localStorage.getItem('name_cart')) || [];
-    document.getElementById('cart-count').innerText = cart.reduce((s,i) => s + i.quantity, 0);
+    const count = cart.reduce((s,i) => s + i.quantity, 0);
+    document.getElementById('cart-count').innerText = count;
+    const mCount = document.getElementById('mobile-cart-count');
+    if (count > 0) { mCount.style.display = 'flex'; mCount.innerText = count; } else { mCount.style.display = 'none'; }
   }
 
-  // Init
   updateCartCount();
   loadGallery();
 </script>
