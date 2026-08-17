@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const { google } = require('googleapis');
+const nodemailer = require('nodemailer');
 
 dotenv.config();
 
@@ -25,6 +26,59 @@ app.use(express.static(path.join(__dirname, '..', 'admin')));
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB error:', err));
+
+// ── Email Setup (order notifications) ──
+// Uses a Gmail App Password, NOT your normal Gmail password — Google blocks
+// regular password logins for automated senders. Generate one at:
+// https://myaccount.google.com/apppasswords (requires 2-Step Verification
+// to be turned on for the Gmail account first).
+//   EMAIL_USER          — the Gmail address that SENDS the notification
+//   EMAIL_APP_PASSWORD  — that account's 16-character App Password
+//   NOTIFY_EMAIL        — the address that RECEIVES the notification (can differ from EMAIL_USER)
+const emailTransporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_APP_PASSWORD,
+  },
+});
+
+// Sends a plain-text order notification email to the store owner's inbox.
+async function sendOrderEmail(order) {
+  try {
+    const itemLines = (order.orderSummary || [])
+      .map(i => `  • ${i.name} × ${i.quantity} — PKR ${(i.price * i.quantity).toLocaleString()}`)
+      .join('\n');
+
+    await emailTransporter.sendMail({
+      from: `"MINM Orders" <${process.env.EMAIL_USER}>`,
+      to: process.env.NOTIFY_EMAIL || process.env.EMAIL_USER,
+      subject: `🛒 New Order — PKR ${Number(order.total).toLocaleString()} from ${order.customerName}`,
+      text: `New order received!
+
+Customer: ${order.customerName}
+Phone: ${order.customerPhone}
+Email: ${order.customerEmail || '—'}
+Address: ${order.address}
+City: ${order.city}
+Landmark: ${order.landmark || '—'}
+Payment: ${order.paymentMethod}
+Notes: ${order.notes || '—'}
+
+Items:
+${itemLines}
+
+Total: PKR ${Number(order.total).toLocaleString()}
+Order ID: ${order._id}
+Placed: ${new Date(order.createdAt || Date.now()).toLocaleString()}
+`,
+    });
+    console.log(`📧 Order email sent for ${order._id}`);
+  } catch (err) {
+    // Never block the order over an email failure — just log it
+    console.error('❌ Order email error:', err.message);
+  }
+}
 
 // ── Google Sheets Setup ──
 // Reads credentials from .env — never hardcode these values here.
@@ -111,8 +165,9 @@ app.post('/api/orders', async (req, res) => {
     await order.save();
     console.log(`📦 New order from ${order.customerName} — PKR ${order.total}`);
 
-    // Fire-and-forget: don't make the customer wait on Sheets before getting their confirmation
+    // Fire-and-forget: don't make the customer wait on Sheets or email before getting their confirmation
     appendOrderToSheet(order);
+    sendOrderEmail(order);
 
     res.status(201).json({ success: true, orderId: order._id });
   } catch (err) {
