@@ -82,23 +82,33 @@ Placed: ${new Date(order.createdAt || Date.now()).toLocaleString()}
 
 // ── Google Sheets Setup ──
 // Reads credentials from .env — never hardcode these values here.
-const sheetsAuth = new google.auth.JWT(
-  process.env.GOOGLE_CLIENT_EMAIL,
-  null,
-  (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-  ['https://www.googleapis.com/auth/spreadsheets']
-);
+const sheetsAuth = new google.auth.JWT({
+  email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  key: (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
+
+// Runs once at startup — prints the REAL underlying auth error immediately
+// (invalid key format, wrong email, key not matching the service account, etc.)
+// instead of only surfacing a generic error later when an order comes in.
+sheetsAuth.authorize()
+  .then(() => console.log('✅ Google Sheets auth successful'))
+  .catch(err => console.error('❌ Google Sheets auth FAILED at startup:', err.message));
 
 const sheets = google.sheets({ version: 'v4', auth: sheetsAuth });
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
 // Appends one order as a new row. Columns match your sheet headers:
-// Date, Order ID, Customer Name, Phone Number, City, Address, Landmark, Payment Method, Total Amount
+// Date, Order ID, Customer Name, Phone Number, City, Address, Landmark, Payment Method, Total Amount, Products
 async function appendOrderToSheet(order) {
   try {
+    const productsList = (order.orderSummary || [])
+      .map(i => `${i.name} x${i.quantity}`)
+      .join(', ');
+
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: 'Sheet1!A:I', // change 'Sheet1' if your tab has a different name
+      range: 'Sheet1!A:J', // change 'Sheet1' if your tab has a different name
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [[
@@ -111,6 +121,7 @@ async function appendOrderToSheet(order) {
           order.landmark || '',
           order.paymentMethod,
           order.total,
+          productsList,
         ]],
       },
     });
