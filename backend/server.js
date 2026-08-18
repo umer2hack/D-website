@@ -160,6 +160,7 @@ const productSchema = new mongoose.Schema({
   badge:    { type: String, default: '' },
   image:    { type: String, default: '' }, // Cloudinary secure_url — uploaded directly from the browser
   video:    { type: String, default: '' }, // Optional Cloudinary video URL — shown as a swipe-to slide in the expand modal
+  featured: { type: Boolean, default: false }, // Manually toggled in admin — controls what shows in the homepage "Featured" section
   active:   { type: Boolean, default: true },
 }, { timestamps: true });
 
@@ -240,9 +241,10 @@ app.delete('/api/orders/:id', async (req, res) => {
 // GET /api/products — get all active products
 app.get('/api/products', async (req, res) => {
   try {
-    const { category } = req.query;
+    const { category, featured } = req.query;
     const filter = { active: true };
     if (category) filter.category = category;
+    if (featured === 'true') filter.featured = true;
     const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
